@@ -26,7 +26,7 @@
         <div class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-lg">🍽️</div>
         <div>
           <h1 class="text-base font-bold leading-tight">วันนี้กินอะไรดี?</h1>
-          <p class="text-[11px] text-amber-100" id="headerLocation">📍 กำลังโหลดพื้นที่...</p>
+          <p class="text-[11px] text-amber-100 font-medium" id="headerLocation">📍 กำลังเตรียมข้อมูล...</p>
         </div>
       </div>
       <div>
@@ -38,7 +38,7 @@
       </div>
     </header>
 
-    <!-- หน้าจอหลักของแอปพลิเคชัน (แสดงผลทันที ไม่ต้องล็อกอิน) -->
+    <!-- หน้าจอหลักของแอปพลิเคชัน -->
     <section id="appScreen" class="p-4 flex-1 flex flex-col">
       
       <!-- แถบสลับโหมด: สุ่มทำเอง vs ไปกินที่ร้าน -->
@@ -86,7 +86,7 @@
           <div>
             <label class="block text-[11px] font-semibold text-slate-500 mb-1">จังหวัด</label>
             <select id="provinceSelect" onchange="onProvinceChange()" class="w-full px-3 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
-              <option value="">-- กรุณาเลือกจังหวัด --</option>
+              <!-- ข้อมูลจะถูกโหลดโดยอัตโนมัติ -->
             </select>
           </div>
 
@@ -94,7 +94,7 @@
           <div>
             <label class="block text-[11px] font-semibold text-slate-500 mb-1">อำเภอ / เขต</label>
             <select id="districtSelect" class="w-full px-3 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
-              <option value="">-- กรุณาเลือกอำเภอ/เขต --</option>
+              <!-- ข้อมูลจะถูกโหลดตามจังหวัด -->
             </select>
           </div>
         </div>
@@ -110,7 +110,7 @@
       </div>
     </div>
 
-    <!-- Modal 2: รายละเอียดเมนูทำอาหารเอง (ละเอียดระดับจับมือทำ + ตรงปก) -->
+    <!-- Modal 2: รายละเอียดเมนูทำอาหารเอง -->
     <div id="cookResultModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[88vh] overflow-y-auto shadow-2xl flex flex-col">
         <div class="relative mb-3">
@@ -177,8 +177,8 @@
     // 1. ข้อมูลจังหวัด และ อำเภอ (Cascading Dropdown)
     // ==========================================
     const locationData = {
-      "ขอนแก่น": ["เมืองขอนแก่น", "บ้านไผ่", "ชุมแพ", "น้ำพอง", "กระนวน", "พล", "ภูเวียง", "มัญจาคีรี"],
       "ชลบุรี": ["บางละมุง (พัทยา)", "เมืองชลบุรี", "ศรีราชา", "สัตหีบ", "บ้านบึง", "พานทอง", "พนัสนิคม"],
+      "ขอนแก่น": ["เมืองขอนแก่น", "บ้านไผ่", "ชุมแพ", "น้ำพอง", "กระนวน", "พล", "ภูเวียง", "มัญจาคีรี"],
       "กรุงเทพมหานคร": ["พระนคร", "พญาไท", "จตุจักร", "บางรัก", "คลองเตย", "วัฒนา", "ห้วยขวาง", "บางเขน"],
       "เชียงใหม่": ["เมืองเชียงใหม่", "สันทราย", "หางดง", "แม่ริม", "สันกำแพง", "สารภี", "จอมทอง"],
       "นครราชสีมา": ["เมืองนครราชสีมา", "ปากช่อง", "พิมาย", "โชคชัย", "สีคิ้ว", "โนนไทย", "ด่านขุนทด"],
@@ -434,7 +434,6 @@
     const ctx = canvas.getContext("2d");
     const wheelColors = ["#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#8B5CF6", "#F97316", "#06B6D4", "#EAB308"];
 
-    // ฟังก์ชันวาดวงล้อบน HTML5 Canvas
     function drawWheel() {
       const numSegments = activeWheelItems.length;
       if (numSegments === 0) return;
@@ -478,7 +477,7 @@
       updateLocationUI();
       refreshWheelDataset();
 
-      // หากยังไม่เคยเลือกพื้นที่เลย ให้เปิดกล่องเลือกพื้นที่ขึ้นมา
+      // หากยังไม่เคยบันทึกพื้นที่มาก่อน ให้เปิดหน้าต่างเลือกพื้นที่ขึ้นมา
       if (!localStorage.getItem("user_province")) {
         openLocationModal();
       }
@@ -516,32 +515,48 @@
     }
 
     // ==========================================
-    // 5. ระบบ Dropdown และจัดการพื้นที่
+    // 5. ระบบ Dropdown และจัดการพื้นที่ (แก้ไขปัญหา Dropdown ว่าง)
     // ==========================================
     function initProvinceDropdown() {
       const provSelect = document.getElementById("provinceSelect");
-      provSelect.innerHTML = `<option value="">-- กรุณาเลือกจังหวัด --</option>`;
+      let html = `<option value="">-- กรุณาเลือกจังหวัด --</option>`;
       Object.keys(locationData).forEach(prov => {
-        provSelect.innerHTML += `<option value="${prov}">${prov}</option>`;
+        html += `<option value="${prov}">${prov}</option>`;
       });
+      provSelect.innerHTML = html;
     }
 
     function onProvinceChange() {
       const selectedProv = document.getElementById("provinceSelect").value;
       const distSelect = document.getElementById("districtSelect");
-      distSelect.innerHTML = `<option value="">-- กรุณาเลือกอำเภอ/เขต --</option>`;
-
+      
       if (selectedProv && locationData[selectedProv]) {
+        let html = "";
         locationData[selectedProv].forEach(dist => {
-          distSelect.innerHTML += `<option value="${dist}">${dist}</option>`;
+          html += `<option value="${dist}">${dist}</option>`;
         });
+        distSelect.innerHTML = html;
+      } else {
+        distSelect.innerHTML = `<option value="">-- กรุณาเลือกอำเภอ/เขต --</option>`;
       }
     }
 
     function openLocationModal() {
-      document.getElementById("provinceSelect").value = currentProvince || "";
+      initProvinceDropdown();
+      const provSelect = document.getElementById("provinceSelect");
+      
+      // เลือกจังหวัดปัจจุบัน
+      provSelect.value = currentProvince;
+      
+      // อัปเดตรายการอำเภอตามจังหวัดปัจจุบัน
       onProvinceChange();
-      document.getElementById("districtSelect").value = currentDistrict || "";
+      
+      // เลือกอำเภอปัจจุบัน
+      const distSelect = document.getElementById("districtSelect");
+      if (currentDistrict) {
+        distSelect.value = currentDistrict;
+      }
+
       document.getElementById("locationModal").classList.remove("hidden");
     }
 
@@ -567,9 +582,7 @@
     }
 
     function updateLocationUI() {
-      const locText = (currentProvince && currentDistrict) 
-        ? `📍 ${currentDistrict}, ${currentProvince}` 
-        : "📍 ยังไม่ได้เลือกพื้นที่";
+      const locText = `📍 ${currentDistrict}, ${currentProvince}`;
       document.getElementById("headerLocation").innerText = locText;
     }
 
