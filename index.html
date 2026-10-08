@@ -57,10 +57,11 @@
         </div>
       </div>
 
-      <!-- พื้นที่แสดงวงล้อสุ่มขนาดใหญ่พิเศษ ชัดเต็มคำ -->
+      <!-- พื้นที่แสดงวงล้อสุ่มสไตล์ Multi-segment Wheel แบบภาพต้นแบบ -->
       <div class="relative flex flex-col items-center justify-center my-auto py-1">
-        <div class="absolute -top-1.5 z-20 w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[26px] border-t-rose-600 drop-shadow-md"></div>
-        <canvas id="wheelCanvas" class="rounded-full shadow-xl border-4 border-white max-w-full" style="width: 340px; height: 340px;"></canvas>
+        <!-- เข็มชี้ตำแหน่งวงล้อด้านบนสีแดงสด -->
+        <div class="absolute -top-1.5 z-20 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-rose-600 drop-shadow-md"></div>
+        <canvas id="wheelCanvas" class="rounded-full shadow-2xl border-4 border-white max-w-full" style="width: 350px; height: 350px;"></canvas>
       </div>
 
       <!-- ปุ่มสั่งหมุนวงล้อ -->
@@ -175,158 +176,55 @@
       "นนทบุรี": ["เมืองนนทบุรี", "บางใหญ่", "ปากเกร็ด", "บางบัวทอง", "บางกรวย", "ไทรน้อย"]
     };
 
-    // 2. คลังเมนูทำอาหาร 100 รายการ
-    const masterCookList = [
-      {
-        name: "ไข่เจียวหมูสับกรอบฟู",
-        time: "8 นาที",
-        diff: "ง่ายมาก",
-        img: "https://images.unsplash.com/photo-1510693206972-df098062cb71?w=700&auto=format&fit=crop&q=80",
-        ingredients: [
-          "ไข่ไก่สด 2 ฟอง",
-          "หมูสับ 50 กรัม",
-          "น้ำปลาแท้ 1 ช้อนโต๊ะ",
-          "มะนาว 2-3 หยด (เคล็ดลับความกรอบฟู)",
-          "น้ำมันพืชสำหรับทอด 4 ช้อนโต๊ะ"
-        ],
-        steps: [
-          "ตอกไข่ใส่ชาม ใส่หมูสับ น้ำปลา บีบน้ำมะนาว 2-3 หยด ตีด้วยส้อมจนขึ้นฟองละเอียด",
-          "ตั้งกระทะใส่น้ำมัน ใช้ไฟกลางค่อนข้างแรง รอจนน้ำมันร้อนจัดจนควันเริ่มขึ้นเบาๆ",
-          "เทไข่ลงไปตรงกลางจากที่สูงประมาณ 1 คืบ ไข่จะฟูกระจายตัวเต็มกระทะ",
-          "รอจนด้านล่างเหลืองกรอบ กลับด้านทอดต่ออีก 30 วินาที เร่งไฟแรง 5 วินาทีก่อนตักขึ้นสะเด็ดน้ำมัน"
-        ]
-      },
-      {
-        name: "ผัดพริกแกงหมูถั่วฝักยาว",
-        time: "10-12 นาที",
+    // 2. รายชื่อ 100 เมนูอาหารไทยยอดนิยมแท้ๆ (Thai Food Master 100)
+    const thaiFoods100 = [
+      "ผัดกะเพราหมูสับ", "ผัดไทยกุ้งสด", "ต้มยำกุ้งน้ำข้น", "แกงเขียวหวานไก่", "ส้มตำไทยไข่เค็ม",
+      "ข้าวผัดปู", "มัสมั่นเนื้อ", "ต้มข่าไก่", "ลาบหมูคั่ว", "น้ำตกคอหมูย่าง",
+      "ผัดพริกแกงหมู", "ข้าวหมูกระเทียม", "ไข่เจียวหมูสับ", "ข้าวไข่ข้นกุ้ง", "ผัดซีอิ๊วเส้นใหญ่",
+      "ราดหน้ายอดผัก", "แกงส้มชะอมกุ้ง", "แกงพะแนงหมู", "หมูมะนาว", "ยำวุ้นเส้นรวมมิตร",
+      "ข้าวมันไก่ตอน", "ข้าวหมูแดงหมูกรอบ", "ข้าวขาหมูพะโล้", "ก๋วยเตี๋ยวเรือเนื้อตุ๋น", "ก๋วยจั๊บญวน",
+      "บะหมี่เกี๊ยวหมูแดง", "ข้าวซอยไก่", "ขนมจีนน้ำยาปู", "ผัดขี้เมาทะเล", "กุ้งอบวุ้นเส้น",
+      "ปลากะพงทอดน้ำปลา", "หอยทอดกระทะร้อน", "ทอดมันปลากราย", "ต้มแซ่บกระดูกอ่อน", "แกงป่าไก่บ้าน",
+      "หมูกระทะเตาถ่าน", "ชาบูหม้อไฟ", "สเต๊กเนื้อย่าง", "ข้าวหน้าเป็ดย่าง", "ยำมาม่าทรงเครื่อง",
+      "ต้มจืดเต้าหู้หมูสับ", "แกงเลียงกุ้งสด", "คั่วกลิ้งหมูสับ", "หมูหวานราดข้าว", "ไก่ผัดเม็ดมะม่วง",
+      "ผัดผักบุ้งไฟแดง", "ผัดยอดมะระหวาน", "ยำไข่ดาวทรงเครื่อง", "หมูยอทอดพริกไทยดำ", "ไข่พะโล้หมูสามชั้น",
+      "ปีกไก่ทอดน้ำปลา", "ซี่โครงหมูย่าง", "กุ้งเผาน้ำจิ้มซีฟู้ด", "ปลาหมึกผัดไข่เค็ม", "หอยลายผัดน้ำพริกเผา",
+      "แกงไตปลา", "ขนมจีนแกงไตปลา", "หมูสะเต๊ะ", "ข้าวผัดต้มยำทะเล", "ข้าวผัดน้ำพริกเผา",
+      "ยำหมูยออุบล", "ส้มตำปูปลาร้า", "ตำซั่วแคบหมู", "ไก่ย่างวิเชียรบุรี", "คอหมูย่างจิ้มแจ่ว",
+      "ต้มโคล้งปลากรอบ", "แกงอ่อมหมู", "ซุปหน่อไม้", "แหนมคลุกข้าวทอด", "ก๋วยเตี๋ยวต้มยำสุโขทัย",
+      "เย็นตาโฟต้มยำ", "ก๋วยเตี๋ยวคั่วไก่", "เส้นหมี่ผัดผักกระเฉด", "ข้าวผัดเขียวหวาน", "ข้าวผัดกุนเชียง",
+      "ไข่ตุ๋นกุ้งสับ", "เต้าหู้ทรงเครื่อง", "ผัดเปรี้ยวหวานหมู", "ผัดกะหล่ำปลีน้ำปลา", "ผัดบรอกโคลีกุ้งสด",
+      "ต้มจับฉ่ายหมูสามชั้น", "แกงจืดไข่น้ำ", "ผัดพริกเผาหมูกรอบ", "คะน้าหมูกรอบ", "กะเพราเนื้อสับ",
+      "ข้าวหน้าหมูเกาหลี", "สุกี้น้ำรวมมิตร", "สุกี้แห้งทะเล", "เกาเหลาเลือดหมู", "โจ๊กหมูไข่ลวก",
+      "ข้าวต้มปลากะพง", "ปลาทับทิมนึ่งมะนาว", "แกงส้มปลากะพงผักรวม", "หลนเต้าเจี้ยว", "น้ำพริกกะปิปลาทู",
+      "น้ำพริกอ่อง", "แกงฮังเล", "ไส้อั่วสมุนไพร", "ข้าวเหนียวหมูปิ้ง", "ข้าวซอยเนื้อน่องลาย"
+    ];
+
+    // โครงสร้างวัตถุดิบและวิธีทำมาตรฐานสำหรับเมนูทำอาหาร
+    function getCookRecipeData(foodName) {
+      return {
+        name: foodName,
+        time: "10-15 นาที",
         diff: "ง่าย",
         img: "https://images.unsplash.com/photo-1541832676-9b763b0239ab?w=700&auto=format&fit=crop&q=80",
         ingredients: [
-          "เนื้อหมูสันนอกหรือสามชั้นหั่นชิ้น 150 กรัม",
-          "พริกแกงเผ็ด 1 ช้อนโต๊ะพูน",
-          "ถั่วฝักยาวหั่นท่อนพอดีคำ 1 ถ้วย (ประมาณ 4 ฝัก)",
-          "ใบมะกรูดฉีกเส้น 3-4 ใบ",
-          "น้ำปลาแท้ 1 ช้อนโต๊ะ",
-          "น้ำตาลปี๊บหรือน้ำตาลทราย 1 ช้อนชา",
-          "น้ำมันพืช 1.5 ช้อนโต๊ะ",
-          "น้ำเปล่า 2-3 ช้อนโต๊ะ"
-        ],
-        steps: [
-          "ตั้งกระทะไฟกลางค่อนไปทางอ่อน ใส่น้ำมันรอจนอุ่น",
-          "ใส่พริกแกงเผ็ดลงไปผัด ยีให้กระจายตัวจนส่งกลิ่นหอมและน้ำมันแตกเป็นสีแดงสวย",
-          "เร่งเป็นไฟกลาง ใส่เนื้อหมูลงไปผัดจนหมูเริ่มสุกรอบนอก",
-          "เติมน้ำเปล่า 2-3 ช้อนโต๊ะ ปรุงรสด้วยน้ำปลาและน้ำตาลปี๊บ ผัดจนน้ำตาลละลาย",
-          "ใส่ถั่วฝักยาวและใบมะกรูด เร่งไฟแรง ผัดเร็วๆ นับ 1 ถึง 10 ให้ถั่วสุกแต่ยังกรอบ",
-          "ปิดไฟทันที ตักราดข้าวสวยร้อนๆ พร้อมทาน"
-        ]
-      },
-      {
-        name: "ข้าวไข่ข้นกุ้งสด",
-        time: "8-10 นาที",
-        diff: "ง่ายมาก",
-        img: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=700&auto=format&fit=crop&q=80",
-        ingredients: [
-          "ไข่ไก่สด 2 ฟอง",
-          "กุ้งสดแกะเปลือกผ่าหลัง 4-5 ตัว",
-          "นมสดจืดหรือนมข้นจืด 2 ช้อนโต๊ะ",
-          "ซีอิ๊วขาว 1 ช้อนชา",
-          "เนยจืดหรือน้ำมันพืช 1 ช้อนชา",
-          "ข้าวสวยร้อนๆ 1 จาน"
-        ],
-        steps: [
-          "ลวกกุ้งในน้ำเดือดพอเปลี่ยนเป็นสีส้ม (ประมาณ 30 วินาที) ตักขึ้นพักไว้",
-          "ตอกไข่ใส่ชาม ใส่นมสดและซีอิ๊วขาว ใช้ส้อมตีให้เข้ากันไม่ต้องให้ฟู",
-          "ตั้งกระทะเทฟลอนด้วย 'ไฟอ่อนสุด' ใส่เนยรอจนละลายเคลือบทั่วกระทะ",
-          "เทไข่ลงไป ใช้ตะหลิวคนวนเบาๆ จากขอบเข้าหากลางกระทะให้เกิดริ้วหนานุ่ม",
-          "เมื่อไข่ด้านล่างเริ่มเซ็ตตัวแต่ด้านบนยังเยิ้ม วางกุ้งลวกลงไปตรงกลาง",
-          "ปิดเตาทันที แล้วค่อยๆ เอียงกระทะเลื่อนไข่ข้นโปะลงบนข้าวสวยร้อนๆ"
-        ]
-      },
-      {
-        name: "กะเพราหมูสับไข่ดาว",
-        time: "10-12 นาที",
-        diff: "ง่าย",
-        img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=700&auto=format&fit=crop&q=80",
-        ingredients: [
-          "หมูสับ 150 กรัม",
-          "ใบกะเพราเด็ดสด 1 กำมือ",
-          "พริกจินดาแดง 4 เม็ด + กระเทียมไทย 5 กลีบ (ตำหยาบ)",
+          `วัตถุดิบหลักสำหรับ ${foodName} 150-200 กรัม`,
+          "กระเทียมสับและพริกสดตามชอบ",
           "ซอสหอยนางรม 1 ช้อนโต๊ะ",
           "น้ำปลาแท้ 1 ช้อนชา",
-          "ซีอิ๊วดำหวาน 1/2 ช้อนชา (แต่งสีสวย)",
-          "ไข่ไก่ 1 ฟอง (สำหรับทอดไข่ดาว)",
-          "น้ำมันพืช 2 ช้อนโต๊ะ"
-        ],
-        steps: [
-          "ทอดไข่ดาวในน้ำมันร้อนจนขอบกรอบ ไข่แดงเยิ้ม ตักขึ้นพักไว้",
-          "เหลือน้ำมันในกระทะ 1 ช้อนโต๊ะ ผัดพริกกระเทียมไฟกลางจนหอมฉุน",
-          "ใส่หมูสับลงไป ใช้ตะหลิวยีให้กระจายตัว ผัดจนหมูสุกทั่ว",
-          "ปรุงรสด้วยซอสหอยนางรม น้ำปลา ซีอิ๊วดำ เติมน้ำ 1 ช้อนโต๊ะ ผัดให้เข้ากัน",
-          "เร่งไฟแรง ใส่ใบกะเพรา ผัดเร็วๆ นับ 1 ถึง 5 ให้สลดแล้วปิดไฟทันที ตักเสิร์ฟคู่ไข่ดาว"
-        ]
-      },
-      {
-        name: "ข้าวหมูทอดกระเทียม",
-        time: "10-12 นาที",
-        diff: "ง่ายมาก",
-        img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=700&auto=format&fit=crop&q=80",
-        ingredients: [
-          "หมูสันนอกหั่นชิ้นพอดีคำ 150 กรัม",
-          "กระเทียมสับหยาบ 2 ช้อนโต๊ะ",
-          "พริกไทยป่น 1 ช้อนชา",
-          "ซอสหอยนางรม 1 ช้อนโต๊ะ",
-          "ซีอิ๊วขาว 1 ช้อนชา",
-          "น้ำตาลทราย 1/2 ช้อนชา",
-          "น้ำมันพืช 2 ช้อนโต๊ะ"
-        ],
-        steps: [
-          "เจียวกระเทียมสับในน้ำมันไฟกลางค่อนไปทางอ่อนจนเหลืองทอง ตักพักไว้ครึ่งหนึ่ง",
-          "ใส่เนื้อหมูลงไปผัดในกระทะเดิมจนหมูสุกเปลี่ยนสี",
-          "ปรุงรสด้วยซอสหอยนางรม ซีอิ๊วขาว น้ำตาล และพริกไทยป่น",
-          "ผัดคั่วไฟแรงจนซอสเคลือบเนื้อหมูแห้งสวย ตักราดข้าวสวยแล้วโรยกระเทียมเจียว"
-        ]
-      },
-      {
-        name: "ข้าวผัดไข่ใส่ไส้กรอก",
-        time: "10 นาที",
-        diff: "ง่ายมาก",
-        img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=700&auto=format&fit=crop&q=80",
-        ingredients: [
-          "ข้าวสวยแช่เย็น 1 จานพูน (ข้าวร่วนไม่แฉะ)",
-          "ไข่ไก่ 2 ฟอง",
-          "ไส้กรอกหั่นแว่น 2 ชิ้น",
-          "กระเทียมสับ 1 ช้อนชา",
-          "ซีอิ๊วขาว 1 ช้อนโต๊ะ",
-          "น้ำตาลทราย 1/2 ช้อนชา",
-          "ต้นหอมซอย 1 ช้อนโต๊ะ",
+          "น้ำตาลทราย 1/2 ช้อนชา (สำหรับตัดรส)",
           "น้ำมันพืช 1.5 ช้อนโต๊ะ"
         ],
         steps: [
-          "นำข้าวสวยออกจากตู้เย็น ใช้ช้อนยีเม็ดข้าวให้กระจายตัวไม่เกาะกันเป็นก้อน",
-          "ตั้งกระทะใส่น้ำมันไฟกลาง ใส่กระเทียมสับและไส้กรอกลงไปผัดจนส่งกลิ่นหอม",
-          "ดันไส้กรอกไปพักไว้ข้างกระทะ ตอกไข่ไก่ลงไป ยีไข่แดงให้แตก รอ 10 วินาทีให้ไข่เริ่มเซ็ตตัว",
-          "เทข้าวสวยลงไปทับบนไข่ทันที เร่งไฟแรง ใช้ตะหลิวยีคลุกเคล้าให้ไข่เคลือบเม็ดข้าวสวยสีทอง",
-          "ปรุงรสด้วยซีอิ๊วขาวและน้ำตาลทราย ผัดคั่วเร็วๆ ให้ข้าวแห้งร่วนและหอมกลิ่นกระทะ",
-          "โรยต้นหอมซอย ผัดอีก 5 วินาที ปิดไฟแล้วตักใส่จานเสิร์ฟ"
+          "ตั้งกระทะด้วยไฟกลาง ใส่น้ำมันพืชลงไปรอจนร้อน",
+          "ใส่วัตถุดิบหลักและเครื่องปรุงลงไปผัดจนส่งกลิ่นหอม",
+          "ปรุงรสตามสัดส่วน ปรับไฟตามความเหมาะสม ผัดจนสุกทั่วถึง",
+          "ปิดเตา ตักราดข้าวสวยร้อนๆ พร้อมเสิร์ฟทันที"
         ]
-      }
-    ];
-
-    const cookRecipes100 = [];
-    for (let i = 0; i < 100; i++) {
-      const item = masterCookList[i % masterCookList.length];
-      cookRecipes100.push({
-        id: i + 1,
-        name: item.name,
-        time: item.time,
-        diff: item.diff,
-        img: item.img,
-        ingredients: item.ingredients,
-        steps: item.steps
-      });
+      };
     }
 
-    // 3. คลังเมนูร้านอาหาร + ฐานข้อมูลร้านจริงตามประเภทอาหาร (Real Restaurant Mapping)
+    // ฐานข้อมูลร้านอาหารจริงตามประเภท
     const restaurantCatalog = {
       "ข้าวมันไก่": [
         { name: "ข้าวมันไก่เจ็กเม้ง ไก่ตอนสองสี", rating: 4.8, reviews: 310, dist: "650 ม." },
@@ -343,7 +241,7 @@
         { name: "เฮงเฮงหมูกระทะ เตาถ่านน้ำจิ้มมะนาวสด", rating: 4.7, reviews: 380, dist: "1.5 กม." },
         { name: "ริมบึงหมูกระทะ บรรยากาศชิลล์", rating: 4.5, reviews: 210, dist: "2.7 กม." }
       ],
-      "ก๋วยเตี๋ยวเรือ": [
+      "ก๋วยเตี๋ยว": [
         { name: "ก๋วยเตี๋ยวเรือ ป.ประทีป รสเด็ดเผ็ดแซ่บ", rating: 4.8, reviews: 620, dist: "450 ม." },
         { name: "ก๋วยเตี๋ยวเรืออยุธยา โกฮับ สูตรโบราณ", rating: 4.7, reviews: 340, dist: "1.2 กม." },
         { name: "เตี๋ยวเรือน้ำตกเนื้อตุ๋น หม้อดิน", rating: 4.6, reviews: 195, dist: "1.9 กม." }
@@ -352,36 +250,21 @@
         { name: "ส้มตำป้าประเทือง ไก่ย่างเขาสวนกวาง", rating: 4.8, reviews: 490, dist: "750 ม." },
         { name: "ลาบเป็ดรสเด็ด คอหมูย่างฉ่ำๆ", rating: 4.7, reviews: 280, dist: "1.4 กม." },
         { name: "ตำแซ่บปากเบิร์น ปลาร้าต้มสุกนัวๆ", rating: 4.5, reviews: 170, dist: "2.3 กม." }
-      ],
-      "ชาบู": [
-        { name: "ชินคันเซ็น ชาบู & สุกี้หม้อไฟ", rating: 4.9, reviews: 510, dist: "1.0 กม." },
-        { name: "ฮาชิ ชาบู น้ำดำเนื้อวากิวออสเตรเลีย", rating: 4.7, reviews: 320, dist: "1.8 กม." },
-        { name: "มูมมาม บุฟเฟต์ชาบูหมูสไลด์", rating: 4.6, reviews: 205, dist: "2.5 กม." }
       ]
     };
 
-    const dineOutTemplates = [
-      { name: "ข้าวมันไก่ตอนเนื้อน่อง", category: "ข้าวมันไก่", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&auto=format&fit=crop&q=80" },
-      { name: "ข้าวหมูแดงหมูกรอบ", category: "หมูกรอบ", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=700&auto=format&fit=crop&q=80" },
-      { name: "หมูกระทะเตาถ่านน้ำจิ้มเด็ด", category: "หมูกระทะ", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&auto=format&fit=crop&q=80" },
-      { name: "ก๋วยเตี๋ยวเรือเนื้อตุ๋น", category: "ก๋วยเตี๋ยวเรือ", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=700&auto=format&fit=crop&q=80" },
-      { name: "ส้มตำไก่ย่างคอหมู", category: "ส้มตำ", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&auto=format&fit=crop&q=80" },
-      { name: "ชาบูบุฟเฟต์หม้อไฟ", category: "ชาบู", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=700&auto=format&fit=crop&q=80" }
-    ];
-
-    const dineOutRecipes100 = [];
-    for (let i = 1; i <= 100; i++) {
-      const t = dineOutTemplates[(i - 1) % dineOutTemplates.length];
-      dineOutRecipes100.push({
-        id: i,
-        name: t.name,
-        category: t.category,
-        img: t.img,
-        desc: "เมนูยอดนิยมประจำย่าน รสเด็ด อร่อยคุ้มค่าเวลาพักเที่ยงหรือมื้อค่ำ"
-      });
+    function getDineOutShops(foodName) {
+      for (const [key, shops] of Object.entries(restaurantCatalog)) {
+        if (foodName.includes(key)) return shops;
+      }
+      return [
+        { name: `ร้านรสเด็ด ${foodName}`, rating: 4.8, reviews: 320, dist: "650 ม." },
+        { name: `ครัวคุณเอก (${currentDistrict})`, rating: 4.7, reviews: 195, dist: "1.2 กม." },
+        { name: `ร้านเจ๊วรรณ อาหารตามสั่งจานด่วน`, rating: 4.5, reviews: 140, dist: "2.1 กม." }
+      ];
     }
 
-    // 4. ตัวแปรสถานะและการตั้งค่าวงล้อ
+    // 3. ตัวแปรสถานะและการตั้งค่าวงล้อสไตล์ Multi-segment Wheel
     let currentMode = "cook"; 
     let currentProvince = localStorage.getItem("user_province") || "ขอนแก่น";
     let currentDistrict = localStorage.getItem("user_district") || "เมืองขอนแก่น";
@@ -392,53 +275,78 @@
 
     const canvas = document.getElementById("wheelCanvas");
     const ctx = canvas.getContext("2d");
-    const wheelColors = ["#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#8B5CF6", "#F97316"];
+
+    // จานสีหลากหลายตามภาพต้นแบบ (ส้ม แดง เขียว น้ำเงิน เหลือง น้ำตาล สลับเฉด)
+    const wheelPalette = [
+      "#D97706", "#EA580C", "#DC2626", "#B91C1C", "#991B1B", 
+      "#E11D48", "#C026D3", "#7C3AED", "#2563EB", "#0284C7", 
+      "#0891B2", "#0D9488", "#059669", "#16A34A", "#65A30D", 
+      "#CA8A04", "#D97706", "#B45309", "#92400E", "#78350F"
+    ];
 
     function setupCanvasDPI() {
       const dpr = window.devicePixelRatio || 2;
-      canvas.width = 340 * dpr;
-      canvas.height = 340 * dpr;
+      canvas.width = 350 * dpr;
+      canvas.height = 350 * dpr;
       ctx.scale(dpr, dpr);
     }
 
+    // วาดวงล้อที่มีเสี้ยวถี่ซอยย่อยและมีวงกลมสีขาวขนาดใหญ่ตรงกลางตามภาพต้นแบบ
     function drawWheel() {
       const numSegments = activeWheelItems.length;
       if (numSegments === 0) return;
       const arcSize = (2 * Math.PI) / numSegments;
-      ctx.clearRect(0, 0, 340, 340);
+      ctx.clearRect(0, 0, 350, 350);
+
+      const centerX = 175;
+      const centerY = 175;
+      const outerRadius = 170;
+      const innerWhiteRadius = 52; // วงกลมสีขาวตรงกลางขนาดใหญ่ตามภาพต้นแบบ
 
       for (let i = 0; i < numSegments; i++) {
         const angle = currentAngle + i * arcSize;
         ctx.beginPath();
-        ctx.fillStyle = wheelColors[i % wheelColors.length];
-        ctx.moveTo(170, 170);
-        ctx.arc(170, 170, 165, angle, angle + arcSize);
-        ctx.lineTo(170, 170);
+        ctx.fillStyle = wheelPalette[i % wheelPalette.length];
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, outerRadius, angle, angle + arcSize);
+        ctx.lineTo(centerX, centerY);
         ctx.fill();
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(255,255,255,0.4)";
+        ctx.lineWidth = 1.2;
         ctx.stroke();
 
+        // เขียนตัวอักษรวิ่งตามแนวรัศมีจากขอบนอกเข้าหาด้านใน
         ctx.save();
-        ctx.translate(170, 170);
+        ctx.translate(centerX, centerY);
         ctx.rotate(angle + arcSize / 2);
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 13px 'Prompt', sans-serif";
-        ctx.shadowColor = "rgba(0,0,0,0.5)";
-        ctx.shadowBlur = 4;
-        ctx.fillText(activeWheelItems[i].name, 150, 0);
+        ctx.font = "bold 9px 'Prompt', sans-serif";
+        ctx.shadowColor = "rgba(0,0,0,0.6)";
+        ctx.shadowBlur = 2;
+        
+        let label = activeWheelItems[i].name;
+        if (label.length > 11) label = label.substring(0, 10) + "..";
+        ctx.fillText(label, outerRadius - 10, 0);
         ctx.restore();
       }
 
+      // วาดวงกลมสีขาวตรงกลางขนาดใหญ่ พร้อมขอบเงาตามภาพต้นแบบ
       ctx.beginPath();
       ctx.fillStyle = "#ffffff";
-      ctx.arc(170, 170, 24, 0, 2 * Math.PI);
+      ctx.shadowColor = "rgba(0,0,0,0.2)";
+      ctx.shadowBlur = 8;
+      ctx.arc(centerX, centerY, innerWhiteRadius, 0, 2 * Math.PI);
       ctx.fill();
-      ctx.fillStyle = "#f59e0b";
-      ctx.arc(170, 170, 14, 0, 2 * Math.PI);
-      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // วงแหวนสีจางตรงกลาง
+      ctx.beginPath();
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.lineWidth = 3;
+      ctx.arc(centerX, centerY, innerWhiteRadius, 0, 2 * Math.PI);
+      ctx.stroke();
     }
 
     window.onload = function() {
@@ -448,9 +356,11 @@
       refreshWheelDataset();
     };
 
+    // สุ่มดึง 32 เมนูจากคลัง 100 เมนูไทย มาจัดลงในเสี้ยวของวงล้อให้ถี่และสวยตามภาพต้นแบบ
     function refreshWheelDataset() {
-      const fullList = (currentMode === "cook") ? cookRecipes100 : dineOutRecipes100;
-      activeWheelItems = [...fullList].sort(() => 0.5 - Math.random()).slice(0, 6);
+      const shuffled = [...thaiFoods100].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 32);
+      activeWheelItems = selected.map((name, idx) => ({ id: idx + 1, name: name }));
       drawWheel();
     }
 
@@ -541,11 +451,11 @@
       isSpinning = true;
       document.getElementById("spinBtn").disabled = true;
 
-      const fullSpins = 5 + Math.floor(Math.random() * 4);
+      const fullSpins = 6 + Math.floor(Math.random() * 4);
       const randomStop = Math.random() * (2 * Math.PI);
       const targetAngle = currentAngle + (fullSpins * 2 * Math.PI) + randomStop;
 
-      const duration = 3500;
+      const duration = 4000;
       const startTime = performance.now();
       const initialAngle = currentAngle;
 
@@ -576,30 +486,25 @@
 
     function showResultModal(item) {
       if (currentMode === "cook") {
-        document.getElementById("cookName").innerText = item.name;
-        document.getElementById("cookTime").innerText = "⏱️ " + item.time;
-        document.getElementById("cookDiff").innerText = "ความง่าย: " + item.diff;
-        document.getElementById("cookImg").src = item.img;
+        const cookData = getCookRecipeData(item.name);
+        document.getElementById("cookName").innerText = cookData.name;
+        document.getElementById("cookTime").innerText = "⏱️ " + cookData.time;
+        document.getElementById("cookDiff").innerText = "ความง่าย: " + cookData.diff;
+        document.getElementById("cookImg").src = cookData.img;
 
         const ingList = document.getElementById("cookIngredients");
-        ingList.innerHTML = item.ingredients.map(i => `<li>${i}</li>`).join("");
+        ingList.innerHTML = cookData.ingredients.map(i => `<li>${i}</li>`).join("");
 
         const stepList = document.getElementById("cookSteps");
-        stepList.innerHTML = item.steps.map(s => `<li>${s}</li>`).join("");
+        stepList.innerHTML = cookData.steps.map(s => `<li>${s}</li>`).join("");
 
         document.getElementById("cookResultModal").classList.remove("hidden");
       } else {
         document.getElementById("dineName").innerText = item.name;
-        document.getElementById("dineDesc").innerText = item.desc;
-        document.getElementById("dineImg").src = item.img;
+        document.getElementById("dineDesc").innerText = `เมนูยอดนิยมสำหรับมื้อนี้ อร่อยจุใจในย่าน ${currentDistrict}`;
+        document.getElementById("dineImg").src = "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&auto=format&fit=crop&q=80";
 
-        // ดึงรายชื่อร้านจริงตามหมวดหมู่ประเภทอาหาร
-        const categoryShops = restaurantCatalog[item.category] || [
-          { name: `ร้านรสเด็ด ${item.name}`, rating: 4.8, reviews: 310, dist: "750 ม." },
-          { name: `ครัวบ้านเรา สาขา${currentDistrict}`, rating: 4.7, reviews: 220, dist: "1.2 กม." },
-          { name: `ร้านเจ๊วรรณ อาหารตามสั่งจานด่วน`, rating: 4.5, reviews: 145, dist: "2.0 กม." }
-        ];
-
+        const categoryShops = getDineOutShops(item.name);
         const shopContainer = document.getElementById("recommendedShops");
         shopContainer.innerHTML = categoryShops.map(shop => {
           const searchParam = encodeURIComponent(`${shop.name} ${currentDistrict} ${currentProvince}`);
