@@ -191,7 +191,10 @@
       "หมูทอด": "https://images.unsplash.com/photo-1544025162-d76694265947?w=600",
       "ข้าวมันไก่": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600",
       "ก๋วยเตี๋ยว": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600",
-      "ส้มตำ": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600"
+      "ส้มตำ": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
+      "แกง": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600",
+      "ยำ": "https://images.unsplash.com/photo-1586511925558-a4ba625c120f?w=600",
+      "ทอด": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600"
     };
 
     function getFallbackImage(foodName) {
@@ -217,7 +220,7 @@
     }
 
     // ==========================================
-    // 2. ระบบดึงข้อมูลจังหวัดและอำเภอจาก Open Data
+    // 2. ระบบดึงข้อมูลจังหวัดและอำเภอ 77 จังหวัด
     // ==========================================
     let thaiProvincesData = [];
 
@@ -225,21 +228,28 @@
       const provSelect = document.getElementById("provinceSelect");
       provSelect.innerHTML = `<option value="">-- กำลังโหลดรายชื่อจังหวัด... --</option>`;
       try {
-        const res = await fetch("https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure.json");
+        const res = await fetch("https://raw.githubusercontent.com/kongvut/thai-province-data/master/api/latest/province_with_district_and_sub_district.json");
         thaiProvincesData = await res.json();
-        thaiProvincesData.sort((a, b) => a.name_th.localeCompare(b.name_th, 'th'));
+        
+        thaiProvincesData.sort((a, b) => {
+          const nameA = a.name ? a.name.th : a.name_th;
+          const nameB = b.name ? b.name.th : b.name_th;
+          return nameA.localeCompare(nameB, 'th');
+        });
+
         let html = `<option value="">-- กรุณาเลือกจังหวัด --</option>`;
         thaiProvincesData.forEach(p => {
-          html += `<option value="${p.name_th}">${p.name_th}</option>`;
+          const pName = p.name ? p.name.th : p.name_th;
+          html += `<option value="${pName}">${pName}</option>`;
         });
         provSelect.innerHTML = html;
+
         if (currentProvince) {
           provSelect.value = currentProvince;
           onProvinceChange();
         }
       } catch (err) {
         console.warn("ไม่สามารถโหลดรายชื่อจังหวัดออนไลน์ได้", err);
-        loadFallbackLocations();
       }
     }
 
@@ -249,29 +259,30 @@
       distSelect.innerHTML = `<option value="">-- กรุณาเลือกอำเภอ/เขต --</option>`;
       if (!selectedProvName) return;
 
-      const provinceObj = thaiProvincesData.find(p => p.name_th === selectedProvName);
-      if (provinceObj && provinceObj.amphure) {
-        const sortedAmphures = [...provinceObj.amphure].sort((a, b) => a.name_th.localeCompare(b.name_th, 'th'));
+      const provinceObj = thaiProvincesData.find(p => {
+        const pName = p.name ? p.name.th : p.name_th;
+        return pName === selectedProvName;
+      });
+
+      if (provinceObj) {
+        const districtsList = provinceObj.districts || provinceObj.amphure || [];
+        const sortedDistricts = [...districtsList].sort((a, b) => {
+          const nameA = a.name ? a.name.th : a.name_th;
+          const nameB = b.name ? b.name.th : b.name_th;
+          return nameA.localeCompare(nameB, 'th');
+        });
+
         let html = `<option value="">-- กรุณาเลือกอำเภอ/เขต --</option>`;
-        sortedAmphures.forEach(a => {
-          html += `<option value="${a.name_th}">${a.name_th}</option>`;
+        sortedDistricts.forEach(a => {
+          const dName = a.name ? a.name.th : a.name_th;
+          html += `<option value="${dName}">${dName}</option>`;
         });
         distSelect.innerHTML = html;
-        if (currentDistrict) distSelect.value = currentDistrict;
+        
+        if (currentDistrict) {
+          distSelect.value = currentDistrict;
+        }
       }
-    }
-
-    function loadFallbackLocations() {
-      const fallback = {
-        "กรุงเทพมหานคร": ["พระนคร", "จตุจักร", "บางรัก", "คลองเตย", "วัฒนา", "พญาไท", "บางเขน"],
-        "ขอนแก่น": ["เมืองขอนแก่น", "บ้านไผ่", "ชุมแพ", "น้ำพอง", "กระนวน", "พล", "ภูเวียง"],
-        "ชลบุรี": ["บางละมุง (พัทยา)", "เมืองชลบุรี", "ศรีราชา", "สัตหีบ", "บ้านบึง", "พานทอง"],
-        "เชียงใหม่": ["เมืองเชียงใหม่", "สันทราย", "หางดง", "แม่ริม", "สันกำแพง", "สารภี"]
-      };
-      const provSelect = document.getElementById("provinceSelect");
-      let html = `<option value="">-- กรุณาเลือกจังหวัด --</option>`;
-      Object.keys(fallback).forEach(p => { html += `<option value="${p}">${p}</option>`; });
-      provSelect.innerHTML = html;
     }
 
     // ==========================================
@@ -365,8 +376,8 @@
     // 4. ตัวแปรสถานะและการตั้งค่าวงล้อ
     // ==========================================
     let currentMode = "cook"; 
-    let currentProvince = localStorage.getItem("user_province") || "ขอนแก่น";
-    let currentDistrict = localStorage.getItem("user_district") || "เมืองขอนแก่น";
+    let currentProvince = localStorage.getItem("user_province") || "";
+    let currentDistrict = localStorage.getItem("user_district") || "";
     let isSpinning = false;
     let currentAngle = 0;
     let activeWheelItems = [];
@@ -449,6 +460,11 @@
       initFullThailandLocations();
       updateLocationUI();
       refreshWheelDataset();
+
+      // เปิดหน้าต่างเลือกพื้นที่ถ้ายังไม่เคยเลือก
+      if (!localStorage.getItem("user_province")) {
+        openLocationModal();
+      }
     };
 
     function refreshWheelDataset() {
@@ -513,7 +529,7 @@
     }
 
     function updateLocationUI() {
-      const locText = `📍 ${currentDistrict}, ${currentProvince}`;
+      const locText = currentProvince ? `📍 ${currentDistrict}, ${currentProvince}` : "📍 กำลังเตรียมข้อมูล...";
       document.getElementById("headerLocation").innerText = locText;
     }
 
