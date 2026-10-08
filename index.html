@@ -59,7 +59,6 @@
 
       <!-- พื้นที่แสดงวงล้อสุ่มขนาดใหญ่พิเศษ ชัดเต็มคำ -->
       <div class="relative flex flex-col items-center justify-center my-auto py-1">
-        <!-- เข็มชี้ตำแหน่งวงล้อ -->
         <div class="absolute -top-1.5 z-20 w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[26px] border-t-rose-600 drop-shadow-md"></div>
         <canvas id="wheelCanvas" class="rounded-full shadow-xl border-4 border-white max-w-full" style="width: 340px; height: 340px;"></canvas>
       </div>
@@ -108,8 +107,12 @@
     <!-- Modal เมนูทำอาหารเอง -->
     <div id="cookResultModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[88vh] overflow-y-auto shadow-2xl flex flex-col">
-        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden h-44 flex items-center justify-center shadow-inner">
+        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden h-48 flex items-center justify-center shadow-inner">
           <img id="cookImg" src="" class="w-full h-full object-cover" alt="ภาพอาหาร">
+          <div id="imgLoadingText" class="absolute inset-0 bg-slate-200/90 flex flex-col items-center justify-center gap-2 text-xs text-slate-600 font-medium">
+            <div class="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+            <span>กำลังดึงรูปอาหารจริงจาก Google...</span>
+          </div>
           <button onclick="closeModal('cookResultModal')" class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm z-10">✕</button>
         </div>
 
@@ -138,7 +141,7 @@
     <!-- Modal เมนูไปกินที่ร้าน -->
     <div id="dineOutResultModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col">
-        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden h-40 flex items-center justify-center shadow-inner">
+        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden h-44 flex items-center justify-center shadow-inner">
           <img id="dineImg" src="" class="w-full h-full object-cover" alt="ภาพอาหาร">
           <button onclick="closeModal('dineOutResultModal')" class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm z-10">✕</button>
         </div>
@@ -166,27 +169,31 @@
   </main>
 
   <script>
-    // 1. ฟังก์ชันสร้างภาพอาหารจำลองแบบ AI SVG Art (การันตีโหลดติด 100% ทุกมือถือ ไม่ถูกบล็อก)
-    function createFoodSvg(emoji, bgGradient, title) {
-      const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
-        <defs>
-          <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="${bgGradient[0]}"/>
-            <stop offset="100%" stop-color="${bgGradient[1]}"/>
-          </linearGradient>
-        </defs>
-        <rect width="600" height="400" fill="url(#g)"/>
-        <circle cx="300" cy="180" r="110" fill="rgba(255,255,255,0.2)"/>
-        <circle cx="300" cy="180" r="95" fill="rgba(255,255,255,0.9)"/>
-        <text x="300" y="210" font-size="95" text-anchor="middle">${emoji}</text>
-        <rect x="50" y="315" width="500" height="55" rx="20" fill="rgba(0,0,0,0.5)"/>
-        <text x="300" y="352" font-family="'Prompt', sans-serif" font-size="24" font-weight="bold" fill="#ffffff" text-anchor="middle">${title}</text>
-      </svg>`;
-      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    // ==========================================
+    // กำหนดการเชื่อมต่อ GOOGLE CUSTOM SEARCH API
+    // ==========================================
+    const GOOGLE_API_KEY = "AIzaSyD3jjHiooQv_Up4WiRMaj3oqQK9-pEHQ78";
+    const GOOGLE_CX = "27fc0ea2b5a014ef3";
+
+    // ฟังก์ชันค้นหารูปภาพตรงปกจาก Google Search แบบ Real-time
+    async function fetchFoodImageFromGoogle(foodName) {
+      try {
+        const query = encodeURIComponent(`${foodName} อาหาร`);
+        const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX}&q=${query}&searchType=image&num=1`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.items && data.items.length > 0) {
+          return data.items[0].link; // ดึง URL รูปภาพแรกจาก Google
+        }
+      } catch (err) {
+        console.warn("ไม่สามารถดึงรูปภาพจาก Google Search ได้:", err);
+      }
+      return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600";
     }
 
-    // 2. ข้อมูลจังหวัด และ อำเภอ
+    // 1. ข้อมูลจังหวัด และ อำเภอ
     const locationData = {
       "ขอนแก่น": ["เมืองขอนแก่น", "บ้านไผ่", "ชุมแพ", "น้ำพอง", "กระนวน", "พล", "ภูเวียง", "มัญจาคีรี"],
       "ชลบุรี": ["บางละมุง (พัทยา)", "เมืองชลบุรี", "ศรีราชา", "สัตหีบ", "บ้านบึง", "พานทอง", "พนัสนิคม"],
@@ -196,13 +203,12 @@
       "นนทบุรี": ["เมืองนนทบุรี", "บางใหญ่", "ปากเกร็ด", "บางบัวทอง", "บางกรวย", "ไทรน้อย"]
     };
 
-    // 3. คลังเมนูทำอาหาร พร้อมภาพ SVG Art สีสันสดใส โหลดเร็ว ปลอดภัย 100%
+    // 2. คลังเมนูทำอาหาร 100 รายการ
     const masterCookList = [
       {
         name: "ข้าวผัดไข่ใส่ไส้กรอก",
         time: "10 นาที",
         diff: "ง่ายมาก",
-        img: createFoodSvg("🍳", ["#F59E0B", "#D97706"], "ข้าวผัดไข่ใส่ไส้กรอก"),
         ingredients: [
           "ข้าวสวยแช่เย็น 1 จานพูน (ข้าวร่วนไม่แฉะ)",
           "ไข่ไก่ 2 ฟอง",
@@ -226,7 +232,6 @@
         name: "ไข่เจียวหมูสับกรอบฟู",
         time: "8 นาที",
         diff: "ง่ายมาก",
-        img: createFoodSvg("🥚", ["#EF4444", "#F59E0B"], "ไข่เจียวหมูสับกรอบฟู"),
         ingredients: [
           "ไข่ไก่ 2 ฟอง",
           "หมูสับ 50 กรัม",
@@ -245,7 +250,6 @@
         name: "ผัดพริกแกงหมูถั่วฝักยาว",
         time: "10-12 นาที",
         diff: "ง่าย",
-        img: createFoodSvg("🥘", ["#DC2626", "#991B1B"], "ผัดพริกแกงหมูถั่วฝักยาว"),
         ingredients: [
           "เนื้อหมูสันนอกหรือสามชั้นหั่นชิ้น 150 กรัม",
           "พริกแกงเผ็ด 1 ช้อนโต๊ะพูน",
@@ -269,7 +273,6 @@
         name: "ข้าวไข่ข้นกุ้งสด",
         time: "8-10 นาที",
         diff: "ง่ายมาก",
-        img: createFoodSvg("🦐", ["#F97316", "#EA580C"], "ข้าวไข่ข้นกุ้งสด"),
         ingredients: [
           "ไข่ไก่สด 2 ฟอง",
           "กุ้งสดแกะเปลือกผ่าหลัง 4-5 ตัว",
@@ -291,7 +294,6 @@
         name: "กะเพราหมูสับไข่ดาว",
         time: "10-12 นาที",
         diff: "ง่าย",
-        img: createFoodSvg("🌿", ["#16A34A", "#15803D"], "กะเพราหมูสับไข่ดาว"),
         ingredients: [
           "หมูสับ 150 กรัม",
           "ใบกะเพราเด็ดสด 1 กำมือ",
@@ -314,7 +316,6 @@
         name: "ข้าวหมูทอดกระเทียม",
         time: "10-12 นาที",
         diff: "ง่ายมาก",
-        img: createFoodSvg("🧄", ["#B45309", "#78350F"], "ข้าวหมูทอดกระเทียม"),
         ingredients: [
           "หมูสันนอกหั่นชิ้นพอดีคำ 150 กรัม",
           "กระเทียมสับหยาบ 2 ช้อนโต๊ะ",
@@ -333,7 +334,6 @@
       }
     ];
 
-    // สร้างเมนู 100 รายการ
     const cookRecipes100 = [];
     for (let i = 0; i < 100; i++) {
       const item = masterCookList[i % masterCookList.length];
@@ -342,34 +342,27 @@
         name: item.name,
         time: item.time,
         diff: item.diff,
-        img: item.img,
         ingredients: item.ingredients,
         steps: item.steps
       });
     }
 
-    // เมนูไปกินที่ร้าน 100 เมนู
     const dineOutTemplates = [
-      { name: "ก๋วยเตี๋ยวเรือเนื้อตุ๋น", emoji: "🍜" },
-      { name: "ส้มตำไก่ย่างคอหมู", emoji: "🍗" },
-      { name: "ข้าวมันไก่ตอนเนื้อน่อง", emoji: "🍚" },
-      { name: "ข้าวหมูแดงหมูกรอบ", emoji: "🥩" },
-      { name: "ชาบูบุฟเฟต์หม้อไฟ", emoji: "🍲" },
-      { name: "หมูกระทะเตาถ่านน้ำจิ้มเด็ด", emoji: "🥓" }
+      "ก๋วยเตี๋ยวเรือเนื้อตุ๋น", "ส้มตำไก่ย่างคอหมู", "ข้าวมันไก่ตอนเนื้อน่อง", 
+      "ข้าวหมูแดงหมูกรอบ", "ชาบูบุฟเฟต์หม้อไฟ", "หมูกระทะเตาถ่านน้ำจิ้มเด็ด"
     ];
 
     const dineOutRecipes100 = [];
     for (let i = 1; i <= 100; i++) {
-      const template = dineOutTemplates[(i - 1) % dineOutTemplates.length];
+      const title = dineOutTemplates[(i - 1) % dineOutTemplates.length];
       dineOutRecipes100.push({
         id: i,
-        name: template.name,
-        desc: "เมนูยอดนิยมประจำย่าน รสเด็ด อร่อยคุ้มค่าเวลาพักเที่ยงหรือมื้อค่ำ",
-        img: createFoodSvg(template.emoji, ["#2563EB", "#1D4ED8"], template.name)
+        name: title,
+        desc: "เมนูยอดนิยมประจำย่าน รสเด็ด อร่อยคุ้มค่าเวลาพักเที่ยงหรือมื้อค่ำ"
       });
     }
 
-    // 4. ระบบควบคุมการทำงาน
+    // 3. ตัวแปรสถานะและการตั้งค่าวงล้อ
     let currentMode = "cook"; 
     let currentProvince = localStorage.getItem("user_province") || "ขอนแก่น";
     let currentDistrict = localStorage.getItem("user_district") || "เมืองขอนแก่น";
@@ -382,7 +375,6 @@
     const ctx = canvas.getContext("2d");
     const wheelColors = ["#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#8B5CF6", "#F97316"];
 
-    // ฟังก์ชันปรับความคมชัด HD Canvas
     function setupCanvasDPI() {
       const dpr = window.devicePixelRatio || 2;
       canvas.width = 340 * dpr;
@@ -390,7 +382,6 @@
       ctx.scale(dpr, dpr);
     }
 
-    // วาดวงล้อ: ขยายขนาดใหญ่ขึ้น แสดง 6 ช่องให้อ่านชื่อได้เต็มคำ
     function drawWheel() {
       const numSegments = activeWheelItems.length;
       if (numSegments === 0) return;
@@ -409,7 +400,6 @@
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        // เขียนตัวหนังสือเต็มคำ วางในตำแหน่งที่กว้างที่สุดของเสี้ยว
         ctx.save();
         ctx.translate(170, 170);
         ctx.rotate(angle + arcSize / 2);
@@ -419,13 +409,10 @@
         ctx.font = "bold 13px 'Prompt', sans-serif";
         ctx.shadowColor = "rgba(0,0,0,0.5)";
         ctx.shadowBlur = 4;
-        
-        // วาดชื่อเมนูเต็มคำ ไม่ตัดทอน
         ctx.fillText(activeWheelItems[i].name, 150, 0);
         ctx.restore();
       }
 
-      // แกนกลางวงล้อ
       ctx.beginPath();
       ctx.fillStyle = "#ffffff";
       ctx.arc(170, 170, 24, 0, 2 * Math.PI);
@@ -442,7 +429,6 @@
       refreshWheelDataset();
     };
 
-    // แสดง 6 เมนูต่อการสุ่มหนึ่งรอบ เพื่อให้ช่องกว้าง ตัวหนังสือเต็มคำ
     function refreshWheelDataset() {
       const fullList = (currentMode === "cook") ? cookRecipes100 : dineOutRecipes100;
       activeWheelItems = [...fullList].sort(() => 0.5 - Math.random()).slice(0, 6);
@@ -474,7 +460,6 @@
       refreshWheelDataset();
     }
 
-    // 5. จัดการ Dropdown พื้นที่
     function initProvinceDropdown() {
       const provSelect = document.getElementById("provinceSelect");
       let html = `<option value="">-- กรุณาเลือกจังหวัด --</option>`;
@@ -487,7 +472,6 @@
     function onProvinceChange() {
       const selectedProv = document.getElementById("provinceSelect").value;
       const distSelect = document.getElementById("districtSelect");
-      
       if (selectedProv && locationData[selectedProv]) {
         let html = "";
         locationData[selectedProv].forEach(dist => {
@@ -505,9 +489,7 @@
       provSelect.value = currentProvince;
       onProvinceChange();
       const distSelect = document.getElementById("districtSelect");
-      if (currentDistrict) {
-        distSelect.value = currentDistrict;
-      }
+      if (currentDistrict) distSelect.value = currentDistrict;
       document.getElementById("locationModal").classList.remove("hidden");
     }
 
@@ -522,12 +504,10 @@
         alert("กรุณาเลือกทั้งจังหวัดและอำเภอให้ครบถ้วนครับ");
         return;
       }
-
       currentProvince = prov;
       currentDistrict = dist;
       localStorage.setItem("user_province", prov);
       localStorage.setItem("user_district", dist);
-
       closeLocationModal();
       updateLocationUI();
     }
@@ -537,7 +517,6 @@
       document.getElementById("headerLocation").innerText = locText;
     }
 
-    // 6. ระบบหมุนวงล้อสุ่ม
     function spinWheel() {
       if (isSpinning) return;
       isSpinning = true;
@@ -576,11 +555,10 @@
       requestAnimationFrame(animate);
     }
 
-    // 7. แสดงผลผลลัพธ์
-    function showResultModal(item) {
+    // ฟังก์ชันแสดงผลและโหลดรูปจาก Google Search API
+    async function showResultModal(item) {
       if (currentMode === "cook") {
         document.getElementById("cookName").innerText = item.name;
-        document.getElementById("cookImg").src = item.img;
         document.getElementById("cookTime").innerText = "⏱️ " + item.time;
         document.getElementById("cookDiff").innerText = "ความง่าย: " + item.diff;
 
@@ -590,10 +568,21 @@
         const stepList = document.getElementById("cookSteps");
         stepList.innerHTML = item.steps.map(s => `<li>${s}</li>`).join("");
 
+        const loadingBox = document.getElementById("imgLoadingText");
+        const imgElem = document.getElementById("cookImg");
+        loadingBox.classList.remove("hidden");
         document.getElementById("cookResultModal").classList.remove("hidden");
+
+        // เรียกค้นหารูปภาพจาก Google
+        const googleImgUrl = await fetchFoodImageFromGoogle(item.name);
+        imgElem.src = googleImgUrl;
+        imgElem.onload = () => loadingBox.classList.add("hidden");
+        imgElem.onerror = () => {
+          imgElem.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600";
+          loadingBox.classList.add("hidden");
+        };
       } else {
         document.getElementById("dineName").innerText = item.name;
-        document.getElementById("dineImg").src = item.img;
         document.getElementById("dineDesc").innerText = item.desc;
 
         const district = currentDistrict || "ในเมือง";
@@ -616,6 +605,8 @@
           </div>
         `).join("");
 
+        const dineImg = document.getElementById("dineImg");
+        dineImg.src = await fetchFoodImageFromGoogle(item.name);
         document.getElementById("dineOutResultModal").classList.remove("hidden");
       }
     }
