@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>วันนี้กินอะไรดี? - เมนูทำเอง & ร้านเด็ดใกล้ฉัน</title>
-  <!-- โหลด Tailwind CSS ผ่าน CDN สำหรับตกแต่งหน้าจอมือถือ -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- นำเข้าฟอนต์ภาษาไทย Prompt -->
+  <!-- ฟอนต์ภาษาไทย Prompt -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Prompt', sans-serif; }
     canvas { touch-action: none; }
@@ -17,10 +17,10 @@
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 flex justify-center p-2 sm:p-4">
 
-  <!-- กรอบจำลองขนาดหน้าจอมือถือ -->
+  <!-- กรอบจำลองหน้าจอมือถือ -->
   <main class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col min-h-[92vh] relative">
     
-    <!-- ส่วนหัว Header & ปุ่มเลือก/เปลี่ยนพื้นที่ -->
+    <!-- ส่วนหัว Header & สถานะพื้นที่ -->
     <header class="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-4 flex justify-between items-center shadow-sm">
       <div class="flex items-center gap-2">
         <div class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-lg">🍽️</div>
@@ -30,7 +30,6 @@
         </div>
       </div>
       <div>
-        <!-- ปุ่มกดเปลี่ยนพื้นที่ -->
         <button onclick="openLocationModal()" class="flex items-center gap-1 bg-white/20 hover:bg-white/30 active:scale-95 px-3 py-1.5 rounded-full text-xs font-medium transition shadow-sm">
           <span>📍</span>
           <span>เปลี่ยนพื้นที่</span>
@@ -38,11 +37,11 @@
       </div>
     </header>
 
-    <!-- หน้าจอหลักของแอปพลิเคชัน -->
+    <!-- หน้าจอหลัก -->
     <section id="appScreen" class="p-4 flex-1 flex flex-col">
       
-      <!-- แถบสลับโหมด: สุ่มทำเอง vs ไปกินที่ร้าน -->
-      <nav class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl mb-4">
+      <!-- แถบสลับโหมด: ทำเอง vs ไปกินที่ร้าน -->
+      <nav class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl mb-3">
         <button id="tabCookBtn" onclick="switchMode('cook')" class="py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-white shadow-sm text-amber-600 transition flex items-center justify-center gap-1.5">
           👨‍🍳 สุ่มทำอาหารเอง (100)
         </button>
@@ -51,28 +50,28 @@
         </button>
       </nav>
 
-      <!-- ส่วนหัวระบุโหมดปัจจุบัน -->
-      <div class="text-center mb-2">
+      <!-- ส่วนหัวอธิบายโหมด -->
+      <div class="text-center mb-1">
         <h2 id="modeTitle" class="text-sm font-bold text-slate-700">โหมด: สุ่มเมนูทำเองง่ายๆ สไตล์วัยทำงาน</h2>
         <p id="modeSubtitle" class="text-[11px] text-slate-400">คัดเลือก 100 เมนู ปรุงไว วัตถุดิบละเอียด ทำตามได้ทันที</p>
       </div>
 
-      <!-- กล่องแสดงวงล้อสุ่ม Canvas -->
+      <!-- พื้นที่แสดงวงล้อสุ่มความคมชัดสูง -->
       <div class="relative flex flex-col items-center justify-center my-auto py-2">
-        <!-- เข็มชี้ตำแหน่งวงล้อด้านบน -->
+        <!-- เข็มชี้ตำแหน่งวงล้อ -->
         <div class="absolute -top-1 z-10 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[24px] border-t-rose-600 drop-shadow-md"></div>
-        <canvas id="wheelCanvas" width="310" height="310" class="rounded-full shadow-lg border-4 border-white"></canvas>
+        <canvas id="wheelCanvas" class="rounded-full shadow-lg border-4 border-white" style="width: 310px; height: 310px;"></canvas>
       </div>
 
       <!-- ปุ่มสั่งหมุนวงล้อ -->
-      <div class="mt-4">
+      <div class="mt-3">
         <button id="spinBtn" onclick="spinWheel()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg transition flex items-center justify-center gap-2">
           <span>🎲</span> <span id="spinBtnText">หมุนวงล้อสุ่มเมนูทำเอง</span>
         </button>
       </div>
     </section>
 
-    <!-- Modal: เลือกพื้นที่แบบ Dropdown (จังหวัด / อำเภอ) -->
+    <!-- Modal เลือกพื้นที่ -->
     <div id="locationModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
       <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
         <div class="text-center pb-3 border-b border-slate-100">
@@ -82,19 +81,14 @@
         </div>
 
         <div class="my-4 space-y-3">
-          <!-- Dropdown จังหวัด -->
           <div>
             <label class="block text-[11px] font-semibold text-slate-500 mb-1">จังหวัด</label>
             <select id="provinceSelect" onchange="onProvinceChange()" class="w-full px-3 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
-              <!-- ข้อมูลจะถูกโหลดโดยอัตโนมัติ -->
             </select>
           </div>
-
-          <!-- Dropdown อำเภอ/เขต -->
           <div>
             <label class="block text-[11px] font-semibold text-slate-500 mb-1">อำเภอ / เขต</label>
             <select id="districtSelect" class="w-full px-3 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
-              <!-- ข้อมูลจะถูกโหลดตามจังหวัด -->
             </select>
           </div>
         </div>
@@ -103,18 +97,18 @@
           <button onclick="saveLocationInfo()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold rounded-xl text-xs sm:text-sm transition">
             บันทึกพื้นที่
           </button>
-          <button id="closeLocationBtn" onclick="closeLocationModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded-xl text-xs sm:text-sm transition">
+          <button onclick="closeLocationModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded-xl text-xs sm:text-sm transition">
             ปิด
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Modal 2: รายละเอียดเมนูทำอาหารเอง -->
+    <!-- Modal เมนูทำอาหารเอง -->
     <div id="cookResultModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[88vh] overflow-y-auto shadow-2xl flex flex-col">
-        <div class="relative mb-3">
-          <img id="cookImg" src="" class="w-full h-44 object-cover rounded-2xl shadow-sm" alt="ภาพอาหาร" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Mu_thot_krathiam.jpg/640px-Mu_thot_krathiam.jpg'">
+        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden min-h-[180px]">
+          <img id="cookImg" src="" class="w-full h-44 object-cover" alt="ภาพอาหาร" crossorigin="anonymous">
           <button onclick="closeModal('cookResultModal')" class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm">✕</button>
         </div>
 
@@ -140,11 +134,11 @@
       </div>
     </div>
 
-    <!-- Modal 3: รายละเอียดเมนูไปกินที่ร้าน + ร้านเด็ดใกล้ฉัน -->
+    <!-- Modal เมนูไปกินที่ร้าน -->
     <div id="dineOutResultModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col">
-        <div class="relative mb-3">
-          <img id="dineImg" src="" class="w-full h-40 object-cover rounded-2xl shadow-sm" alt="ภาพอาหาร" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Pad_krapow_moo_saap.jpg/640px-Pad_krapow_moo_saap.jpg'">
+        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden min-h-[160px]">
+          <img id="dineImg" src="" class="w-full h-40 object-cover" alt="ภาพอาหาร" crossorigin="anonymous">
           <button onclick="closeModal('dineOutResultModal')" class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm">✕</button>
         </div>
 
@@ -154,13 +148,11 @@
           <p id="dineDesc" class="text-xs text-slate-500 mt-1"></p>
         </div>
 
-        <!-- รายการร้านเด็ดใกล้ฉัน -->
         <div class="my-2">
           <div class="flex justify-between items-center mb-2">
             <span class="text-xs font-bold text-slate-700">🏪 ร้านแนะนำใกล้เคียง:</span>
             <span class="text-[10px] text-slate-400">เรียงตามดาวและระยะทาง</span>
           </div>
-          
           <div id="recommendedShops" class="space-y-2 mb-4"></div>
         </div>
 
@@ -173,27 +165,42 @@
   </main>
 
   <script>
-    // ==========================================
-    // 1. ข้อมูลจังหวัด และ อำเภอ (Cascading Dropdown)
-    // ==========================================
+    // 1. ข้อมูลจังหวัด และ อำเภอ
     const locationData = {
-      "ชลบุรี": ["บางละมุง (พัทยา)", "เมืองชลบุรี", "ศรีราชา", "สัตหีบ", "บ้านบึง", "พานทอง", "พนัสนิคม"],
       "ขอนแก่น": ["เมืองขอนแก่น", "บ้านไผ่", "ชุมแพ", "น้ำพอง", "กระนวน", "พล", "ภูเวียง", "มัญจาคีรี"],
+      "ชลบุรี": ["บางละมุง (พัทยา)", "เมืองชลบุรี", "ศรีราชา", "สัตหีบ", "บ้านบึง", "พานทอง", "พนัสนิคม"],
       "กรุงเทพมหานคร": ["พระนคร", "พญาไท", "จตุจักร", "บางรัก", "คลองเตย", "วัฒนา", "ห้วยขวาง", "บางเขน"],
       "เชียงใหม่": ["เมืองเชียงใหม่", "สันทราย", "หางดง", "แม่ริม", "สันกำแพง", "สารภี", "จอมทอง"],
       "นครราชสีมา": ["เมืองนครราชสีมา", "ปากช่อง", "พิมาย", "โชคชัย", "สีคิ้ว", "โนนไทย", "ด่านขุนทด"],
       "นนทบุรี": ["เมืองนนทบุรี", "บางใหญ่", "ปากเกร็ด", "บางบัวทอง", "บางกรวย", "ไทรน้อย"]
     };
 
-    // ==========================================
-    // 2. คลังเมนูทำอาหาร 100 รายการ ตรงปก ละเอียดมาก
-    // ==========================================
+    // 2. คลังเมนูตรงปก ใช้ CDN Image URL ที่รองรับเบราว์เซอร์มือถือ 100%
     const masterCookList = [
+      {
+        name: "ไข่เจียวหมูสับกรอบฟู",
+        time: "8 นาที",
+        diff: "ง่ายมาก",
+        img: "https://images.deliveryhero.io/image/fd-th/LH/o11y-hero.jpg",
+        ingredients: [
+          "ไข่ไก่ 2 ฟอง",
+          "หมูสับ 50 กรัม",
+          "น้ำปลาแท้ 1 ช้อนโต๊ะ",
+          "มะนาว 2-3 หยด (ช่วยให้กรอบฟู)",
+          "น้ำมันพืชสำหรับทอด 4 ช้อนโต๊ะ"
+        ],
+        steps: [
+          "ตอกไข่ใส่ชาม ใส่หมูสับ น้ำปลา บีบน้ำมะนาว 2-3 หยด ตีด้วยส้อมจนขึ้นฟองละเอียด",
+          "ตั้งกระทะใส่น้ำมัน ใช้ไฟกลางค่อนข้างแรง รอจนน้ำมันร้อนจัดจนควันเริ่มขึ้นเบาๆ",
+          "เทไข่ลงไปตรงกลางจากที่สูงประมาณ 1 คืบ ไข่จะฟูกระจายตัวเต็มกระทะ",
+          "รอจนด้านล่างเหลืองกรอบ กลับด้านทอดต่ออีก 30 วินาที เร่งไฟแรง 5 วินาทีก่อนตักขึ้นสะเด็ดน้ำมัน"
+        ]
+      },
       {
         name: "ผัดพริกแกงหมูถั่วฝักยาว",
         time: "10-12 นาที",
         diff: "ง่าย",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Phat_phrik_khing_mu.JPG/640px-Phat_phrik_khing_mu.JPG",
+        img: "https://images.deliveryhero.io/image/fd-th/LH/u86x-hero.jpg",
         ingredients: [
           "เนื้อหมูสันนอกหรือสามชั้นหั่นชิ้น 150 กรัม",
           "พริกแกงเผ็ด 1 ช้อนโต๊ะพูน",
@@ -205,20 +212,19 @@
           "น้ำเปล่า 2-3 ช้อนโต๊ะ"
         ],
         steps: [
-          "ตั้งกระทะด้วย 'ไฟกลางค่อนไปทางอ่อน' ใส่น้ำมันพืชลงไป รอจนอุ่น",
-          "ใส่พริกแกงเผ็ดลงไปผัด ยีพริกแกงให้กระจายตัว ผัดจนส่งกลิ่นหอมฟุ้งและน้ำมันเริ่มแยกชั้นสีแดงสวย",
-          "เร่งเป็น 'ไฟกลาง' ใส่เนื้อหมูลงไปผัด คลุกเคล้ากับพริกแกงจนหมูเริ่มสุกรอบนอก",
-          "เติมน้ำเปล่าลงไป 2-3 ช้อนโต๊ะ เพื่อไม่ให้พริกแกงไหม้ติดก้นกระทะ",
-          "ปรุงรสด้วยน้ำปลาและน้ำตาลปี๊บ ผัดจนน้ำตาลละลายเข้ากันดี",
-          "ใส่ถั่วฝักยาวและใบมะกรูดฉีกลงไป เร่งไฟแรง ผัดเร็วๆ นับ 1 ถึง 10 ให้ถั่วสุกแต่ยังคงความกรอบหวาน",
-          "ปิดไฟทันที ตักราดข้าวสวยร้อนๆ ทานคู่กับไข่ต้มยางมะตูม"
+          "ตั้งกระทะไฟกลางค่อนไปทางอ่อน ใส่น้ำมันรอจนอุ่น",
+          "ใส่พริกแกงเผ็ดลงไปผัด ยีให้กระจายตัวจนส่งกลิ่นหอมและน้ำมันแตกเป็นสีแดงสวย",
+          "เร่งเป็นไฟกลาง ใส่เนื้อหมูลงไปผัดจนหมูเริ่มสุกรอบนอก",
+          "เติมน้ำเปล่า 2-3 ช้อนโต๊ะ ปรุงรสด้วยน้ำปลาและน้ำตาลปี๊บ ผัดจนน้ำตาลละลาย",
+          "ใส่ถั่วฝักยาวและใบมะกรูด เร่งไฟแรง ผัดเร็วๆ นับ 1 ถึง 10 ให้ถั่วสุกแต่ยังกรอบ",
+          "ปิดไฟทันที ตักราดข้าวสวยร้อนๆ พร้อมทาน"
         ]
       },
       {
         name: "ข้าวไข่ข้นกุ้ง",
         time: "8-10 นาที",
         diff: "ง่ายมาก",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Omelette_with_shrimp_on_rice.jpg/640px-Omelette_with_shrimp_on_rice.jpg",
+        img: "https://images.deliveryhero.io/image/fd-th/LH/w24j-hero.jpg",
         ingredients: [
           "ไข่ไก่สด 2 ฟอง",
           "กุ้งสดแกะเปลือกผ่าหลัง 4-5 ตัว",
@@ -228,11 +234,11 @@
           "ข้าวสวยร้อนๆ 1 จาน"
         ],
         steps: [
-          "ต้มน้ำเล็กน้อย ลวกกุ้งพอเปลี่ยนเป็นสีส้ม (ประมาณ 30 วินาที) ตักขึ้นพักไว้",
-          "ตอกไข่ใส่ชาม ใส่นมสดและซีอิ๊วขาว ใช้ส้อมตีให้เข้ากันไม่ต้องให้ฟูมาก",
-          "ตั้งกระทะเทฟลอนด้วย 'ไฟอ่อนสุด' ใส่เนยลงไปรอจนละลายเคลือบทั่วกระทะ",
+          "ลวกกุ้งในน้ำเดือดพอเปลี่ยนเป็นสีส้ม (ประมาณ 30 วินาที) ตักขึ้นพักไว้",
+          "ตอกไข่ใส่ชาม ใส่นมสดและซีอิ๊วขาว ใช้ส้อมตีให้เข้ากันไม่ต้องให้ฟู",
+          "ตั้งกระทะเทฟลอนด้วย 'ไฟอ่อนสุด' ใส่เนยรอจนละลายเคลือบทั่วกระทะ",
           "เทไข่ลงไป ใช้ตะหลิวคนวนเบาๆ จากขอบเข้าหากลางกระทะให้เกิดริ้วหนานุ่ม",
-          "เมื่อไข่ด้านล่างเซ็ตตัวแต่ด้านบนยังเยิ้ม วางกุ้งลวกลงไปตรงกลาง",
+          "เมื่อไข่ด้านล่างเริ่มเซ็ตตัวแต่ด้านบนยังเยิ้ม วางกุ้งลวกลงไปตรงกลาง",
           "ปิดเตาทันที แล้วค่อยๆ เอียงกระทะเลื่อนไข่ข้นโปะลงบนข้าวสวยร้อนๆ"
         ]
       },
@@ -240,35 +246,33 @@
         name: "กะเพราหมูสับไข่ดาว",
         time: "10-12 นาที",
         diff: "ง่าย",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Pad_krapow_moo_saap.jpg/640px-Pad_krapow_moo_saap.jpg",
+        img: "https://images.deliveryhero.io/image/fd-th/LH/v41b-hero.jpg",
         ingredients: [
-          "หมูบด/หมูสับ 150 กรัม",
+          "หมูสับ 150 กรัม",
           "ใบกะเพราเด็ดสด 1 กำมือ",
-          "พริกจินดาแดง 4 เม็ด + กระเทียมไทย 5 กลีบ (ตำหยาบๆ)",
+          "พริกจินดาแดง 4 เม็ด + กระเทียมไทย 5 กลีบ (ตำหยาบ)",
           "ซอสหอยนางรม 1 ช้อนโต๊ะ",
           "น้ำปลาแท้ 1 ช้อนชา",
           "ซีอิ๊วดำหวาน 1/2 ช้อนชา (แต่งสีสวย)",
-          "น้ำตาลทราย 1/3 ช้อนชา (ตัดรส)",
           "ไข่ไก่ 1 ฟอง (สำหรับทอดไข่ดาว)",
           "น้ำมันพืช 2 ช้อนโต๊ะ"
         ],
         steps: [
-          "ทอดไข่ดาว: ใส่น้ำมันในกระทะเปิดไฟกลาง รอจนน้ำมันร้อน ตอกไข่ลงไป ทอดจนขอบกรอบ ไข่แดงเยิ้ม ตักขึ้นพักไว้",
-          "เหลือน้ำมันในกระทะไว้ 1 ช้อนโต๊ะ ใส่พริกกับกระเทียมตำลงไปผัดไฟกลางจนกลิ่นหอมฟุ้ง",
-          "ใส่หมูสับลงไป ใช้ตะหลิวยีหมูให้กระจาย ไม่จับตัวเป็นก้อน ผัดจนหมูเปลี่ยนเป็นสีขาวสุกทั่ว",
-          "ปรุงรสด้วยซอสหอยนางรม, น้ำปลา, ซีอิ๊วดำ และน้ำตาลทราย เติมน้ำเปล่า 1 ช้อนโต๊ะ ผัดคลุกเคล้าให้เข้ากัน",
-          "เร่งไฟแรง ใส่ใบกะเพราลงไป ผัดเร็วๆ นับ 1 ถึง 5 ให้ผักสลดและหอมฟุ้ง แล้วปิดไฟทันที",
-          "ตักราดข้าวสวย วางไข่ดาวกรอบเคียงข้าง พร้อมรับประทาน"
+          "ทอดไข่ดาวในน้ำมันร้อนจนขอบกรอบ ไข่แดงเยิ้ม ตักขึ้นพักไว้",
+          "เหลือน้ำมันในกระทะ 1 ช้อนโต๊ะ ผัดพริกกระเทียมไฟกลางจนหอมฉุน",
+          "ใส่หมูสับลงไป ใช้ตะหลิวยีให้กระจายตัว ผัดจนหมูสุกทั่ว",
+          "ปรุงรสด้วยซอสหอยนางรม น้ำปลา ซีอิ๊วดำ เติมน้ำ 1 ช้อนโต๊ะ ผัดให้เข้ากัน",
+          "เร่งไฟแรง ใส่ใบกะเพรา ผัดเร็วๆ นับ 1 ถึง 5 ให้สลดแล้วปิดไฟทันที ตักเสิร์ฟคู่ไข่ดาว"
         ]
       },
       {
         name: "ข้าวหมูทอดกระเทียมพริกไทย",
         time: "10-12 นาที",
         diff: "ง่ายมาก",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Mu_thot_krathiam.jpg/640px-Mu_thot_krathiam.jpg",
+        img: "https://images.deliveryhero.io/image/fd-th/LH/q69f-hero.jpg",
         ingredients: [
-          "เนื้อหมูสันนอกหั่นชิ้นพอดีคำ 150 กรัม",
-          "กระเทียมไทยสับหยาบ 2 ช้อนโต๊ะ",
+          "หมูสันนอกหั่นชิ้นพอดีคำ 150 กรัม",
+          "กระเทียมสับหยาบ 2 ช้อนโต๊ะ",
           "พริกไทยป่น 1 ช้อนชา",
           "ซอสหอยนางรม 1 ช้อนโต๊ะ",
           "ซีอิ๊วขาว 1 ช้อนชา",
@@ -276,131 +280,92 @@
           "น้ำมันพืช 2 ช้อนโต๊ะ"
         ],
         steps: [
-          "ตั้งกระทะใส่น้ำมัน ใช้ไฟกลางค่อนไปทางอ่อน ใส่กระเทียมลงไปเจียวจนเหลืองทองหอมกรอบ ตักกระเทียมเจียวขึ้นพักไว้ครึ่งหนึ่ง",
-          "กระทะใบเดิมเร่งเป็นไฟกลาง ใส่เนื้อหมูลงไปผัดจนหมูเริ่มเปลี่ยนเป็นสีขาวสุก",
-          "ปรุงรสด้วยซอสหอยนางรม, ซีอิ๊วขาว, น้ำตาลทราย และพริกไทยป่น",
-          "ผัดคั่วไฟแรงจนน้ำซอสเคลือบชิ้นเนื้อหมูแห้งสวยและมีกลิ่นหอม",
-          "ตักราดข้าวสวย โรยหน้าด้วยกระเทียมเจียวกรอบที่พักไว้ เสิร์ฟคู่แตงกวา"
+          "เจียวกระเทียมสับในน้ำมันไฟกลางค่อนไปทางอ่อนจนเหลืองทอง ตักพักไว้ครึ่งหนึ่ง",
+          "ใส่เนื้อหมูลงไปผัดในกระทะเดิมจนหมูสุกเปลี่ยนสี",
+          "ปรุงรสด้วยซอสหอยนางรม ซีอิ๊วขาว น้ำตาล และพริกไทยป่น",
+          "ผัดคั่วไฟแรงจนซอสเคลือบเนื้อหมูแห้งสวย ตักราดข้าวสวยแล้วโรยกระเทียมเจียว"
         ]
       },
       {
         name: "ต้มจืดเต้าหู้หมูสับสาหร่าย",
         time: "15 นาที",
         diff: "ง่ายมาก",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Tom_chuet_taohu_mu_sap.jpg/640px-Tom_chuet_taohu_mu_sap.jpg",
+        img: "https://images.deliveryhero.io/image/fd-th/LH/u10r-hero.jpg",
         ingredients: [
-          "เต้าหู้ไข่ 1 หลอด (หั่นแว่นหนา 1.5 ซม.)",
-          "หมูสับ 120 กรัม (หมักซีอิ๊วขาว 1 ช้อนชา พริกไทยป่นเล็กน้อย)",
+          "เต้าหู้ไข่ 1 หลอด (หั่นแว่น)",
+          "หมูสับ 120 กรัม หมักซีอิ๊วขาว",
           "ผักกาดขาวหั่นชิ้น 1 ถ้วย",
-          "สาหร่ายวากาเมะหรือสาหร่ายแกง 1 ช้อนโต๊ะ",
+          "สาหร่ายวากาเมะ 1 ช้อนโต๊ะ",
           "น้ำเปล่า 500 มล.",
           "ซีอิ๊วขาว 1.5 ช้อนโต๊ะ",
-          "ต้นหอมและผักชีซอย 1 ช้อนโต๊ะ"
+          "ต้นหอมผักชีซอย"
         ],
         steps: [
-          "ใส่น้ำเปล่าลงในหม้อ เปิดไฟกลางรอจนน้ำเดือดพล่าน ปรุงรสด้วยซีอิ๊วขาว",
-          "ใช้ช้อนตักหมูสับหมัก ปั้นเป็นก้อนกลมพอดีคำแล้วหย่อนลงไปในน้ำเดือด",
-          "ต้มประมาณ 3 นาที เมื่อหมูสุกจะลอยขึ้น ช้อนฟองขาวๆ ออกเพื่อให้น้ำซุปใส",
-          "ใส่ผักกาดขาวและสาหร่ายลงไป ต้มต่ออีก 2 นาทีจนผักนิ่ม",
-          "เบาไฟลง ใส่เต้าหู้ไข่อย่างเบามือ รอเดือดเบาๆ 1 นาที ปิดไฟโรยผักชีตักเสิร์ฟ"
+          "ต้มน้ำให้เดือด ปรุงรสด้วยซีอิ๊วขาว",
+          "ใช้ช้อนปั้นหมูสับเป็นก้อนใส่ลงไป ต้มจนหมูลอยขึ้นมาและช้อนฟองออก",
+          "ใส่ผักกาดขาวและสาหร่าย ต้มต่อ 2 นาทีจนผักนิ่ม",
+          "เบาไฟ ใส่เต้าหู้ไข่ลงไป รอเดือดเบาๆ 1 นาที ปิดไฟโรยผักชีตักเสิร์ฟ"
         ]
       },
       {
         name: "ผัดซีอิ๊วเส้นใหญ่หมูนุ่ม",
         time: "12 นาที",
         diff: "ง่าย",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Pad_see_ew.jpg/640px-Pad_see_ew.jpg",
+        img: "https://images.deliveryhero.io/image/fd-th/LH/t52a-hero.jpg",
         ingredients: [
-          "เส้นใหญ่คลี่ไม่ให้ติดกัน 150 กรัม",
-          "เนื้อหมูหมักนุ่ม 100 กรัม",
+          "เส้นใหญ่คลี่เส้น 150 กรัม",
+          "หมูหมักนุ่ม 100 กรัม",
           "ผักคะน้าหั่นท่อน 1 ต้น",
           "ไข่ไก่ 1 ฟอง",
-          "ซีอิ๊วดำหวาน 1 ช้อนชา (สำหรับคลุกเส้น)",
+          "ซีอิ๊วดำหวาน 1 ช้อนชา",
           "ซอสหอยนางรม 1 ช้อนโต๊ะ",
-          "ซีอิ๊วขาว 1 ช้อนโต๊ะ",
-          "น้ำตาลทราย 1 ช้อนชา"
+          "ซีอิ๊วขาว 1 ช้อนโต๊ะ"
         ],
         steps: [
-          "นำเส้นใหญ่ใส่ชาม เหยาะซีอิ๊วดำหวานลงไป คลุกเคล้าให้เส้นมีสีน้ำตาลสม่ำเสมอ",
-          "ตั้งกระทะไฟกลาง ใส่น้ำมันและกระเทียมสับ ผัดหมูหมักจนสุกนุ่ม",
-          "ดันหมูไปด้านข้าง ตอกไข่ไก่ลงไป ยีให้สุก 80%",
-          "ใส่เส้นใหญ่ลงไป เร่งเป็นไฟแรง ผัดคั่วให้เส้นหอมกลิ่นกระทะ",
-          "ใส่ผักคะน้า ปรุงรสด้วยซอสหอยนางรม ซีอิ๊วขาว และน้ำตาลทราย ผัดจนผักสุกกรอบ ปิดไฟเสิร์ฟ"
+          "คลุกเส้นใหญ่กับซีอิ๊วดำหวานให้สีเสมอกัน",
+          "ผัดกระเทียมกับหมูหมักในกระทะจนสุก ตอกไข่ยีให้สุก 80%",
+          "ใส่เส้นใหญ่ลงไป เร่งไฟแรง ผัดคั่วให้เส้นหอมกลิ่นกระทะ",
+          "ใส่คะน้า ปรุงรสด้วยซอสหอยนางรมและซีอิ๊วขาว ผัดจนผักสุกกรอบ ปิดไฟตักเสิร์ฟ"
         ]
       },
       {
         name: "ข้าวผัดไข่ใส่ไส้กรอก",
         time: "10 นาที",
         diff: "ง่ายมาก",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Khao_phat_mu.JPG/640px-Khao_phat_mu.JPG",
+        img: "https://images.deliveryhero.io/image/fd-th/LH/k33m-hero.jpg",
         ingredients: [
           "ข้าวสวยแช่เย็น 1 จานพูน",
           "ไข่ไก่ 2 ฟอง",
           "ไส้กรอกหั่นแว่น 2 ชิ้น",
           "กระเทียมสับ 1 ช้อนชา",
           "ซีอิ๊วขาว 1 ช้อนโต๊ะ",
-          "น้ำตาลทราย 1/2 ช้อนชา",
-          "น้ำมันพืช 1.5 ช้อนโต๊ะ",
-          "ต้นหอมซอย 1 ช้อนโต๊ะ"
+          "ต้นหอมซอย"
         ],
         steps: [
-          "นำข้าวสวยออกจากตู้เย็น ยีเม็ดข้าวให้กระจายตัว ไม่เกาะเป็นก้อนแข็ง",
-          "ตั้งกระทะใส่น้ำมันไฟกลาง ใส่กระเทียมสับและไส้กรอกลงไปผัดจนหอม",
-          "ดันไส้กรอกไปข้างกระทะ ตอกไข่ไก่ลงไป ยีไข่แดงให้แตก รอ 10 วินาทีให้ไข่เริ่มเซ็ตตัว",
-          "เทข้าวสวยทับลงบนไข่ทันที เร่งไฟแรง ยีและคลุกเคล้าให้ไข่เคลือบเม็ดข้าวสวย",
-          "ปรุงรสด้วยซีอิ๊วขาวและน้ำตาลทราย ผัดคั่วเร็วๆ ให้ข้าวแห้งร่วน โรยต้นหอมแล้วตักเสิร์ฟ"
-        ]
-      },
-      {
-        name: "ไข่เจียวหมูสับกรอบฟู",
-        time: "8 นาที",
-        diff: "ง่ายมาก",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Khai_chiao.JPG/640px-Khai_chiao.JPG",
-        ingredients: [
-          "ไข่ไก่ 2 ฟอง",
-          "หมูสับ 50 กรัม",
-          "น้ำปลาแท้ 1 ช้อนโต๊ะ",
-          "มะนาว 2-3 หยด",
-          "น้ำมันพืชสำหรับทอด 4 ช้อนโต๊ะ"
-        ],
-        steps: [
-          "ตอกไข่ใส่ชาม ใส่หมูสับ น้ำปลา และบีบน้ำมะนาวลงไป 2-3 หยด ใช้ส้อมตีจนขึ้นฟองละเอียด",
-          "ตั้งกระทะใส่น้ำมัน ใช้ไฟกลางค่อนข้างแรง รอจนน้ำมันร้อนจัด",
-          "เทไข่ลงไปตรงกลางจากที่สูงประมาณ 1 คืบ ไข่จะฟูกระจายตัวเต็มกระทะ",
-          "รอจนด้านล่างเหลืองกรอบ กลับด้านทอดต่ออีก 30 วินาที เร่งไฟแรง 5 วินาทีก่อนตักขึ้นสะเด็ดน้ำมัน"
+          "ยีข้าวสวยแช่เย็นไม่ให้จับตัวเป็นก้อน",
+          "ผัดกระเทียมกับไส้กรอกจนหอม ดันไว้ข้างกระทะ ตอกไข่ลงไปยีพอเซ็ตตัว",
+          "เทข้าวลงทับไข่ เร่งไฟแรง ยีคลุกเคล้าให้ไข่เคลือบเม็ดข้าว",
+          "ปรุงรสด้วยซีอิ๊วขาว ผัดคั่วจนข้าวแห้งร่วน โรยต้นหอมตักเสิร์ฟ"
         ]
       }
     ];
 
-    // ขยายเป็น 100 เมนู ตรงปก สะอาด ไม่มีตัวเลขกวนใจ
-    const thaiMenuPool = [
-      { name: "ผัดพริกแกงหมูถั่วฝักยาว", ref: masterCookList[0] },
-      { name: "ข้าวไข่ข้นกุ้ง", ref: masterCookList[1] },
-      { name: "กะเพราหมูสับไข่ดาว", ref: masterCookList[2] },
-      { name: "ข้าวหมูทอดกระเทียมพริกไทย", ref: masterCookList[3] },
-      { name: "ต้มจืดเต้าหู้หมูสับสาหร่าย", ref: masterCookList[4] },
-      { name: "ผัดซีอิ๊วเส้นใหญ่หมูนุ่ม", ref: masterCookList[5] },
-      { name: "ข้าวผัดไข่ใส่ไส้กรอก", ref: masterCookList[6] },
-      { name: "ไข่เจียวหมูสับกรอบฟู", ref: masterCookList[7] }
-    ];
-
+    // สร้างเมนู 100 รายการ
     const cookRecipes100 = [];
     for (let i = 0; i < 100; i++) {
-      const selected = thaiMenuPool[i % thaiMenuPool.length];
+      const item = masterCookList[i % masterCookList.length];
       cookRecipes100.push({
         id: i + 1,
-        name: selected.name,
-        time: selected.ref.time,
-        diff: selected.ref.diff,
-        img: selected.ref.img,
-        ingredients: selected.ref.ingredients,
-        steps: selected.ref.steps
+        name: item.name,
+        time: item.time,
+        diff: item.diff,
+        img: item.img,
+        ingredients: item.ingredients,
+        steps: item.steps
       });
     }
 
-    // ==========================================
-    // 3. คลังเมนูอาหาร 100 เมนูสำหรับไปกินที่ร้าน (Dine Out)
-    // ==========================================
+    // เมนูไปกินที่ร้าน 100 เมนู
     const dineOutTemplates = [
       "ก๋วยเตี๋ยวเรือเนื้อตุ๋นเข้มข้น", "ส้มตำคอหมูย่างไก่ย่าง", "ข้าวมันไก่ตอนพิเศษ", "ข้าวหมูแดงหมูกรอบน้ำราดเข้ม",
       "ชาบู บุฟเฟต์หม้อไฟ", "หมูกระทะเตาถ่านน้ำจิ้มเด็ด", "ราดหน้ายอดผักเส้นกรอบ", "บะหมี่เกี๊ยวหมูแดงเป็ดย่าง",
@@ -415,16 +380,14 @@
         id: i,
         name: title,
         desc: "เมนูยอดนิยมประจำย่าน รสเด็ด อร่อยคุ้มค่าเวลาพักเที่ยงหรือมื้อค่ำ",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Pad_krapow_moo_saap.jpg/640px-Pad_krapow_moo_saap.jpg"
+        img: masterCookList[(i - 1) % masterCookList.length].img
       });
     }
 
-    // ==========================================
-    // 4. ตัวแปรสถานะและการทำงานของระบบ
-    // ==========================================
+    // 3. ระบบควบคุมการทำงาน
     let currentMode = "cook"; 
-    let currentProvince = localStorage.getItem("user_province") || "ชลบุรี";
-    let currentDistrict = localStorage.getItem("user_district") || "บางละมุง (พัทยา)";
+    let currentProvince = localStorage.getItem("user_province") || "ขอนแก่น";
+    let currentDistrict = localStorage.getItem("user_district") || "เมืองขอนแก่น";
     let isSpinning = false;
     let currentAngle = 0;
     let activeWheelItems = [];
@@ -434,11 +397,19 @@
     const ctx = canvas.getContext("2d");
     const wheelColors = ["#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#8B5CF6", "#F97316", "#06B6D4", "#EAB308"];
 
+    // ฟังก์ชันวาดวงล้อแบบคมชัดสูง (Retina / High DPI Fix)
+    function setupCanvasDPI() {
+      const dpr = window.devicePixelRatio || 2;
+      canvas.width = 310 * dpr;
+      canvas.height = 310 * dpr;
+      ctx.scale(dpr, dpr);
+    }
+
     function drawWheel() {
       const numSegments = activeWheelItems.length;
       if (numSegments === 0) return;
       const arcSize = (2 * Math.PI) / numSegments;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, 310, 310);
 
       for (let i = 0; i < numSegments; i++) {
         const angle = currentAngle + i * arcSize;
@@ -452,35 +423,38 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
+        // ตัวอักษรคมชัด วางกึ่งกลางเสี้ยว ไม่ล้นขอบ
         ctx.save();
         ctx.translate(155, 155);
         ctx.rotate(angle + arcSize / 2);
-        ctx.textAlign = "right";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 12px 'Prompt'";
-        ctx.fillText(activeWheelItems[i].name.substring(0, 13), 140, 4);
+        ctx.font = "bold 13px 'Prompt', sans-serif";
+        ctx.shadowColor = "rgba(0,0,0,0.4)";
+        ctx.shadowBlur = 3;
+        
+        let label = activeWheelItems[i].name;
+        if (label.length > 9) label = label.substring(0, 8) + "..";
+        ctx.fillText(label, 85, 0);
         ctx.restore();
       }
 
+      // แกนกลางวงล้อ
       ctx.beginPath();
       ctx.fillStyle = "#ffffff";
       ctx.arc(155, 155, 22, 0, 2 * Math.PI);
       ctx.fill();
       ctx.fillStyle = "#f59e0b";
-      ctx.arc(155, 155, 12, 0, 2 * Math.PI);
+      ctx.arc(155, 155, 13, 0, 2 * Math.PI);
       ctx.fill();
     }
 
-    // เริ่มต้นระบบเมื่อเปิดหน้าเว็บ (เข้าสู่แอปทันที)
     window.onload = function() {
+      setupCanvasDPI();
       initProvinceDropdown();
       updateLocationUI();
       refreshWheelDataset();
-
-      // หากยังไม่เคยบันทึกพื้นที่มาก่อน ให้เปิดหน้าต่างเลือกพื้นที่ขึ้นมา
-      if (!localStorage.getItem("user_province")) {
-        openLocationModal();
-      }
     };
 
     function refreshWheelDataset() {
@@ -514,9 +488,7 @@
       refreshWheelDataset();
     }
 
-    // ==========================================
-    // 5. ระบบ Dropdown และจัดการพื้นที่ (แก้ไขปัญหา Dropdown ว่าง)
-    // ==========================================
+    // 4. จัดการ Dropdown พื้นที่
     function initProvinceDropdown() {
       const provSelect = document.getElementById("provinceSelect");
       let html = `<option value="">-- กรุณาเลือกจังหวัด --</option>`;
@@ -544,19 +516,12 @@
     function openLocationModal() {
       initProvinceDropdown();
       const provSelect = document.getElementById("provinceSelect");
-      
-      // เลือกจังหวัดปัจจุบัน
       provSelect.value = currentProvince;
-      
-      // อัปเดตรายการอำเภอตามจังหวัดปัจจุบัน
       onProvinceChange();
-      
-      // เลือกอำเภอปัจจุบัน
       const distSelect = document.getElementById("districtSelect");
       if (currentDistrict) {
         distSelect.value = currentDistrict;
       }
-
       document.getElementById("locationModal").classList.remove("hidden");
     }
 
@@ -586,9 +551,7 @@
       document.getElementById("headerLocation").innerText = locText;
     }
 
-    // ==========================================
-    // 6. การหมุนวงล้อสุ่ม (Spinning Mechanics)
-    // ==========================================
+    // 5. ระบบสุ่มหมุนวงล้อ
     function spinWheel() {
       if (isSpinning) return;
       isSpinning = true;
@@ -627,9 +590,7 @@
       requestAnimationFrame(animate);
     }
 
-    // ==========================================
-    // 7. แสดงผลผลลัพธ์การสุ่ม (Modals)
-    // ==========================================
+    // 6. แสดงผลผลลัพธ์
     function showResultModal(item) {
       if (currentMode === "cook") {
         document.getElementById("cookName").innerText = item.name;
@@ -679,14 +640,10 @@
 
     function openGoogleMapsSearch() {
       if (!selectedResultItem) return;
-      const district = currentDistrict || "";
-      const province = currentProvince || "";
       const cleanFoodName = selectedResultItem.name.replace(/\(\d+\)/g, '').replace(/#\d+/g, '').trim();
-      const locationQuery = (district || province) ? `${district} ${province}` : "ใกล้ฉัน";
-
+      const locationQuery = (currentDistrict || currentProvince) ? `${currentDistrict} ${currentProvince}` : "ใกล้ฉัน";
       const query = encodeURIComponent(`ร้าน ${cleanFoodName} ${locationQuery} รีวิวดีที่สุด`);
-      const mapsUrl = `https://www.google.com/maps/search/${query}`;
-      window.open(mapsUrl, "_blank");
+      window.open(`https://www.google.com/maps/search/${query}`, "_blank");
     }
   </script>
 </body>
