@@ -15,13 +15,13 @@
     canvas { touch-action: none; }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex justify-center p-2 sm:p-4">
+<body class="bg-slate-100 min-h-screen text-slate-800 flex justify-center p-1 sm:p-4">
 
   <!-- กรอบจำลองหน้าจอมือถือ -->
-  <main class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col min-h-[92vh] relative">
+  <main class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col min-h-[95vh] relative">
     
     <!-- ส่วนหัว Header & สถานะพื้นที่ -->
-    <header class="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-4 flex justify-between items-center shadow-sm">
+    <header class="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-3.5 flex justify-between items-center shadow-sm">
       <div class="flex items-center gap-2">
         <div class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-lg">🍽️</div>
         <div>
@@ -38,34 +38,35 @@
     </header>
 
     <!-- หน้าจอหลัก -->
-    <section id="appScreen" class="p-4 flex-1 flex flex-col">
+    <section id="appScreen" class="p-3 flex-1 flex flex-col justify-between">
       
       <!-- แถบสลับโหมด: ทำเอง vs ไปกินที่ร้าน -->
-      <nav class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl mb-3">
-        <button id="tabCookBtn" onclick="switchMode('cook')" class="py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-white shadow-sm text-amber-600 transition flex items-center justify-center gap-1.5">
-          👨‍🍳 สุ่มทำอาหารเอง (100)
-        </button>
-        <button id="tabEatBtn" onclick="switchMode('dineOut')" class="py-2.5 text-xs sm:text-sm font-semibold rounded-xl text-slate-500 transition flex items-center justify-center gap-1.5">
-          🛵 ไปกินตามร้าน (100)
-        </button>
-      </nav>
+      <div>
+        <nav class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl mb-2">
+          <button id="tabCookBtn" onclick="switchMode('cook')" class="py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-white shadow-sm text-amber-600 transition flex items-center justify-center gap-1.5">
+            👨‍🍳 สุ่มทำอาหารเอง (100)
+          </button>
+          <button id="tabEatBtn" onclick="switchMode('dineOut')" class="py-2.5 text-xs sm:text-sm font-semibold rounded-xl text-slate-500 transition flex items-center justify-center gap-1.5">
+            🛵 ไปกินตามร้าน (100)
+          </button>
+        </nav>
 
-      <!-- ส่วนหัวอธิบายโหมด -->
-      <div class="text-center mb-1">
-        <h2 id="modeTitle" class="text-sm font-bold text-slate-700">โหมด: สุ่มเมนูทำเองง่ายๆ สไตล์วัยทำงาน</h2>
-        <p id="modeSubtitle" class="text-[11px] text-slate-400">คัดเลือก 100 เมนู ปรุงไว วัตถุดิบละเอียด ทำตามได้ทันที</p>
+        <div class="text-center mb-1">
+          <h2 id="modeTitle" class="text-xs sm:text-sm font-bold text-slate-700">โหมด: สุ่มเมนูทำเองง่ายๆ สไตล์วัยทำงาน</h2>
+          <p id="modeSubtitle" class="text-[11px] text-slate-400">คัดเลือก 100 เมนู ปรุงไว วัตถุดิบละเอียด ทำตามได้ทันที</p>
+        </div>
       </div>
 
-      <!-- พื้นที่แสดงวงล้อสุ่มความคมชัดสูง -->
-      <div class="relative flex flex-col items-center justify-center my-auto py-2">
+      <!-- พื้นที่แสดงวงล้อสุ่มขนาดใหญ่พิเศษ ชัดเต็มคำ -->
+      <div class="relative flex flex-col items-center justify-center my-auto py-1">
         <!-- เข็มชี้ตำแหน่งวงล้อ -->
-        <div class="absolute -top-1 z-10 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[24px] border-t-rose-600 drop-shadow-md"></div>
-        <canvas id="wheelCanvas" class="rounded-full shadow-lg border-4 border-white" style="width: 310px; height: 310px;"></canvas>
+        <div class="absolute -top-1.5 z-20 w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[26px] border-t-rose-600 drop-shadow-md"></div>
+        <canvas id="wheelCanvas" class="rounded-full shadow-xl border-4 border-white max-w-full" style="width: 340px; height: 340px;"></canvas>
       </div>
 
       <!-- ปุ่มสั่งหมุนวงล้อ -->
-      <div class="mt-3">
-        <button id="spinBtn" onclick="spinWheel()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg transition flex items-center justify-center gap-2">
+      <div class="mt-2 pb-1">
+        <button id="spinBtn" onclick="spinWheel()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 active:scale-95 text-white font-bold text-base rounded-2xl shadow-lg transition flex items-center justify-center gap-2">
           <span>🎲</span> <span id="spinBtnText">หมุนวงล้อสุ่มเมนูทำเอง</span>
         </button>
       </div>
@@ -107,12 +108,12 @@
     <!-- Modal เมนูทำอาหารเอง -->
     <div id="cookResultModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[88vh] overflow-y-auto shadow-2xl flex flex-col">
-        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden min-h-[180px]">
-          <img id="cookImg" src="" class="w-full h-44 object-cover" alt="ภาพอาหาร" crossorigin="anonymous">
-          <button onclick="closeModal('cookResultModal')" class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm">✕</button>
+        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden h-44 flex items-center justify-center shadow-inner">
+          <img id="cookImg" src="" class="w-full h-full object-cover" alt="ภาพอาหาร">
+          <button onclick="closeModal('cookResultModal')" class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm z-10">✕</button>
         </div>
 
-        <h3 id="cookName" class="text-lg font-bold text-slate-800 mb-1"></h3>
+        <h3 id="cookName" class="text-xl font-bold text-slate-800 mb-1"></h3>
         <div class="flex gap-2 mb-3 text-[11px]">
           <span id="cookTime" class="bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full font-medium"></span>
           <span id="cookDiff" class="bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-medium"></span>
@@ -128,7 +129,7 @@
         </h4>
         <ol id="cookSteps" class="list-decimal list-inside text-xs text-slate-600 space-y-2 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed"></ol>
 
-        <button onclick="closeModal('cookResultModal')" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs transition">
+        <button onclick="closeModal('cookResultModal')" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold rounded-xl text-xs transition">
           ตกลง พร้อมทำแล้ว!
         </button>
       </div>
@@ -137,9 +138,9 @@
     <!-- Modal เมนูไปกินที่ร้าน -->
     <div id="dineOutResultModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-3">
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col">
-        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden min-h-[160px]">
-          <img id="dineImg" src="" class="w-full h-40 object-cover" alt="ภาพอาหาร" crossorigin="anonymous">
-          <button onclick="closeModal('dineOutResultModal')" class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm">✕</button>
+        <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden h-40 flex items-center justify-center shadow-inner">
+          <img id="dineImg" src="" class="w-full h-full object-cover" alt="ภาพอาหาร">
+          <button onclick="closeModal('dineOutResultModal')" class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm z-10">✕</button>
         </div>
 
         <div class="text-center mb-3">
@@ -165,7 +166,27 @@
   </main>
 
   <script>
-    // 1. ข้อมูลจังหวัด และ อำเภอ
+    // 1. ฟังก์ชันสร้างภาพอาหารจำลองแบบ AI SVG Art (การันตีโหลดติด 100% ทุกมือถือ ไม่ถูกบล็อก)
+    function createFoodSvg(emoji, bgGradient, title) {
+      const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+        <defs>
+          <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${bgGradient[0]}"/>
+            <stop offset="100%" stop-color="${bgGradient[1]}"/>
+          </linearGradient>
+        </defs>
+        <rect width="600" height="400" fill="url(#g)"/>
+        <circle cx="300" cy="180" r="110" fill="rgba(255,255,255,0.2)"/>
+        <circle cx="300" cy="180" r="95" fill="rgba(255,255,255,0.9)"/>
+        <text x="300" y="210" font-size="95" text-anchor="middle">${emoji}</text>
+        <rect x="50" y="315" width="500" height="55" rx="20" fill="rgba(0,0,0,0.5)"/>
+        <text x="300" y="352" font-family="'Prompt', sans-serif" font-size="24" font-weight="bold" fill="#ffffff" text-anchor="middle">${title}</text>
+      </svg>`;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+
+    // 2. ข้อมูลจังหวัด และ อำเภอ
     const locationData = {
       "ขอนแก่น": ["เมืองขอนแก่น", "บ้านไผ่", "ชุมแพ", "น้ำพอง", "กระนวน", "พล", "ภูเวียง", "มัญจาคีรี"],
       "ชลบุรี": ["บางละมุง (พัทยา)", "เมืองชลบุรี", "ศรีราชา", "สัตหีบ", "บ้านบึง", "พานทอง", "พนัสนิคม"],
@@ -175,18 +196,42 @@
       "นนทบุรี": ["เมืองนนทบุรี", "บางใหญ่", "ปากเกร็ด", "บางบัวทอง", "บางกรวย", "ไทรน้อย"]
     };
 
-    // 2. คลังเมนูตรงปก ใช้ CDN Image URL ที่รองรับเบราว์เซอร์มือถือ 100%
+    // 3. คลังเมนูทำอาหาร พร้อมภาพ SVG Art สีสันสดใส โหลดเร็ว ปลอดภัย 100%
     const masterCookList = [
+      {
+        name: "ข้าวผัดไข่ใส่ไส้กรอก",
+        time: "10 นาที",
+        diff: "ง่ายมาก",
+        img: createFoodSvg("🍳", ["#F59E0B", "#D97706"], "ข้าวผัดไข่ใส่ไส้กรอก"),
+        ingredients: [
+          "ข้าวสวยแช่เย็น 1 จานพูน (ข้าวร่วนไม่แฉะ)",
+          "ไข่ไก่ 2 ฟอง",
+          "ไส้กรอกหั่นแว่น 2 ชิ้น",
+          "กระเทียมสับ 1 ช้อนชา",
+          "ซีอิ๊วขาว 1 ช้อนโต๊ะ",
+          "น้ำตาลทราย 1/2 ช้อนชา",
+          "ต้นหอมซอย 1 ช้อนโต๊ะ",
+          "น้ำมันพืช 1.5 ช้อนโต๊ะ"
+        ],
+        steps: [
+          "นำข้าวสวยออกจากตู้เย็น ใช้ช้อนยีเม็ดข้าวให้กระจายตัวไม่เกาะกันเป็นก้อน",
+          "ตั้งกระทะใส่น้ำมันไฟกลาง ใส่กระเทียมสับและไส้กรอกลงไปผัดจนส่งกลิ่นหอม",
+          "ดันไส้กรอกไปพักไว้ข้างกระทะ ตอกไข่ไก่ลงไป ยีไข่แดงให้แตก รอ 10 วินาทีให้ไข่เริ่มเซ็ตตัว",
+          "เทข้าวสวยลงไปทับบนไข่ทันที เร่งไฟแรง ใช้ตะหลิวยีคลุกเคล้าให้ไข่เคลือบเม็ดข้าวสวยสีทอง",
+          "ปรุงรสด้วยซีอิ๊วขาวและน้ำตาลทราย ผัดคั่วเร็วๆ ให้ข้าวแห้งร่วนและหอมกลิ่นกระทะ",
+          "โรยต้นหอมซอย ผัดอีก 5 วินาที ปิดไฟแล้วตักใส่จานเสิร์ฟ"
+        ]
+      },
       {
         name: "ไข่เจียวหมูสับกรอบฟู",
         time: "8 นาที",
         diff: "ง่ายมาก",
-        img: "https://images.deliveryhero.io/image/fd-th/LH/o11y-hero.jpg",
+        img: createFoodSvg("🥚", ["#EF4444", "#F59E0B"], "ไข่เจียวหมูสับกรอบฟู"),
         ingredients: [
           "ไข่ไก่ 2 ฟอง",
           "หมูสับ 50 กรัม",
           "น้ำปลาแท้ 1 ช้อนโต๊ะ",
-          "มะนาว 2-3 หยด (ช่วยให้กรอบฟู)",
+          "มะนาว 2-3 หยด (เคล็ดลับความกรอบฟู)",
           "น้ำมันพืชสำหรับทอด 4 ช้อนโต๊ะ"
         ],
         steps: [
@@ -200,7 +245,7 @@
         name: "ผัดพริกแกงหมูถั่วฝักยาว",
         time: "10-12 นาที",
         diff: "ง่าย",
-        img: "https://images.deliveryhero.io/image/fd-th/LH/u86x-hero.jpg",
+        img: createFoodSvg("🥘", ["#DC2626", "#991B1B"], "ผัดพริกแกงหมูถั่วฝักยาว"),
         ingredients: [
           "เนื้อหมูสันนอกหรือสามชั้นหั่นชิ้น 150 กรัม",
           "พริกแกงเผ็ด 1 ช้อนโต๊ะพูน",
@@ -221,10 +266,10 @@
         ]
       },
       {
-        name: "ข้าวไข่ข้นกุ้ง",
+        name: "ข้าวไข่ข้นกุ้งสด",
         time: "8-10 นาที",
         diff: "ง่ายมาก",
-        img: "https://images.deliveryhero.io/image/fd-th/LH/w24j-hero.jpg",
+        img: createFoodSvg("🦐", ["#F97316", "#EA580C"], "ข้าวไข่ข้นกุ้งสด"),
         ingredients: [
           "ไข่ไก่สด 2 ฟอง",
           "กุ้งสดแกะเปลือกผ่าหลัง 4-5 ตัว",
@@ -246,7 +291,7 @@
         name: "กะเพราหมูสับไข่ดาว",
         time: "10-12 นาที",
         diff: "ง่าย",
-        img: "https://images.deliveryhero.io/image/fd-th/LH/v41b-hero.jpg",
+        img: createFoodSvg("🌿", ["#16A34A", "#15803D"], "กะเพราหมูสับไข่ดาว"),
         ingredients: [
           "หมูสับ 150 กรัม",
           "ใบกะเพราเด็ดสด 1 กำมือ",
@@ -266,10 +311,10 @@
         ]
       },
       {
-        name: "ข้าวหมูทอดกระเทียมพริกไทย",
+        name: "ข้าวหมูทอดกระเทียม",
         time: "10-12 นาที",
         diff: "ง่ายมาก",
-        img: "https://images.deliveryhero.io/image/fd-th/LH/q69f-hero.jpg",
+        img: createFoodSvg("🧄", ["#B45309", "#78350F"], "ข้าวหมูทอดกระเทียม"),
         ingredients: [
           "หมูสันนอกหั่นชิ้นพอดีคำ 150 กรัม",
           "กระเทียมสับหยาบ 2 ช้อนโต๊ะ",
@@ -284,68 +329,6 @@
           "ใส่เนื้อหมูลงไปผัดในกระทะเดิมจนหมูสุกเปลี่ยนสี",
           "ปรุงรสด้วยซอสหอยนางรม ซีอิ๊วขาว น้ำตาล และพริกไทยป่น",
           "ผัดคั่วไฟแรงจนซอสเคลือบเนื้อหมูแห้งสวย ตักราดข้าวสวยแล้วโรยกระเทียมเจียว"
-        ]
-      },
-      {
-        name: "ต้มจืดเต้าหู้หมูสับสาหร่าย",
-        time: "15 นาที",
-        diff: "ง่ายมาก",
-        img: "https://images.deliveryhero.io/image/fd-th/LH/u10r-hero.jpg",
-        ingredients: [
-          "เต้าหู้ไข่ 1 หลอด (หั่นแว่น)",
-          "หมูสับ 120 กรัม หมักซีอิ๊วขาว",
-          "ผักกาดขาวหั่นชิ้น 1 ถ้วย",
-          "สาหร่ายวากาเมะ 1 ช้อนโต๊ะ",
-          "น้ำเปล่า 500 มล.",
-          "ซีอิ๊วขาว 1.5 ช้อนโต๊ะ",
-          "ต้นหอมผักชีซอย"
-        ],
-        steps: [
-          "ต้มน้ำให้เดือด ปรุงรสด้วยซีอิ๊วขาว",
-          "ใช้ช้อนปั้นหมูสับเป็นก้อนใส่ลงไป ต้มจนหมูลอยขึ้นมาและช้อนฟองออก",
-          "ใส่ผักกาดขาวและสาหร่าย ต้มต่อ 2 นาทีจนผักนิ่ม",
-          "เบาไฟ ใส่เต้าหู้ไข่ลงไป รอเดือดเบาๆ 1 นาที ปิดไฟโรยผักชีตักเสิร์ฟ"
-        ]
-      },
-      {
-        name: "ผัดซีอิ๊วเส้นใหญ่หมูนุ่ม",
-        time: "12 นาที",
-        diff: "ง่าย",
-        img: "https://images.deliveryhero.io/image/fd-th/LH/t52a-hero.jpg",
-        ingredients: [
-          "เส้นใหญ่คลี่เส้น 150 กรัม",
-          "หมูหมักนุ่ม 100 กรัม",
-          "ผักคะน้าหั่นท่อน 1 ต้น",
-          "ไข่ไก่ 1 ฟอง",
-          "ซีอิ๊วดำหวาน 1 ช้อนชา",
-          "ซอสหอยนางรม 1 ช้อนโต๊ะ",
-          "ซีอิ๊วขาว 1 ช้อนโต๊ะ"
-        ],
-        steps: [
-          "คลุกเส้นใหญ่กับซีอิ๊วดำหวานให้สีเสมอกัน",
-          "ผัดกระเทียมกับหมูหมักในกระทะจนสุก ตอกไข่ยีให้สุก 80%",
-          "ใส่เส้นใหญ่ลงไป เร่งไฟแรง ผัดคั่วให้เส้นหอมกลิ่นกระทะ",
-          "ใส่คะน้า ปรุงรสด้วยซอสหอยนางรมและซีอิ๊วขาว ผัดจนผักสุกกรอบ ปิดไฟตักเสิร์ฟ"
-        ]
-      },
-      {
-        name: "ข้าวผัดไข่ใส่ไส้กรอก",
-        time: "10 นาที",
-        diff: "ง่ายมาก",
-        img: "https://images.deliveryhero.io/image/fd-th/LH/k33m-hero.jpg",
-        ingredients: [
-          "ข้าวสวยแช่เย็น 1 จานพูน",
-          "ไข่ไก่ 2 ฟอง",
-          "ไส้กรอกหั่นแว่น 2 ชิ้น",
-          "กระเทียมสับ 1 ช้อนชา",
-          "ซีอิ๊วขาว 1 ช้อนโต๊ะ",
-          "ต้นหอมซอย"
-        ],
-        steps: [
-          "ยีข้าวสวยแช่เย็นไม่ให้จับตัวเป็นก้อน",
-          "ผัดกระเทียมกับไส้กรอกจนหอม ดันไว้ข้างกระทะ ตอกไข่ลงไปยีพอเซ็ตตัว",
-          "เทข้าวลงทับไข่ เร่งไฟแรง ยีคลุกเคล้าให้ไข่เคลือบเม็ดข้าว",
-          "ปรุงรสด้วยซีอิ๊วขาว ผัดคั่วจนข้าวแห้งร่วน โรยต้นหอมตักเสิร์ฟ"
         ]
       }
     ];
@@ -367,24 +350,26 @@
 
     // เมนูไปกินที่ร้าน 100 เมนู
     const dineOutTemplates = [
-      "ก๋วยเตี๋ยวเรือเนื้อตุ๋นเข้มข้น", "ส้มตำคอหมูย่างไก่ย่าง", "ข้าวมันไก่ตอนพิเศษ", "ข้าวหมูแดงหมูกรอบน้ำราดเข้ม",
-      "ชาบู บุฟเฟต์หม้อไฟ", "หมูกระทะเตาถ่านน้ำจิ้มเด็ด", "ราดหน้ายอดผักเส้นกรอบ", "บะหมี่เกี๊ยวหมูแดงเป็ดย่าง",
-      "สเต๊กถาดรวมมิตร", "ก๋วยจั๊บญวนซี่โครงหมู", "ข้าวซอยไก่โบราณ", "อาหารตามสั่งกะเพราถาด",
-      "ผัดไทยกุ้งสดหอยทอด", "โจ๊กหมูเด้งใส่ไข่ลวก", "ข้าวขาหมูคากิ", "ซูชิและซาชิมิดงบุริ"
+      { name: "ก๋วยเตี๋ยวเรือเนื้อตุ๋น", emoji: "🍜" },
+      { name: "ส้มตำไก่ย่างคอหมู", emoji: "🍗" },
+      { name: "ข้าวมันไก่ตอนเนื้อน่อง", emoji: "🍚" },
+      { name: "ข้าวหมูแดงหมูกรอบ", emoji: "🥩" },
+      { name: "ชาบูบุฟเฟต์หม้อไฟ", emoji: "🍲" },
+      { name: "หมูกระทะเตาถ่านน้ำจิ้มเด็ด", emoji: "🥓" }
     ];
 
     const dineOutRecipes100 = [];
     for (let i = 1; i <= 100; i++) {
-      const title = dineOutTemplates[(i - 1) % dineOutTemplates.length];
+      const template = dineOutTemplates[(i - 1) % dineOutTemplates.length];
       dineOutRecipes100.push({
         id: i,
-        name: title,
+        name: template.name,
         desc: "เมนูยอดนิยมประจำย่าน รสเด็ด อร่อยคุ้มค่าเวลาพักเที่ยงหรือมื้อค่ำ",
-        img: masterCookList[(i - 1) % masterCookList.length].img
+        img: createFoodSvg(template.emoji, ["#2563EB", "#1D4ED8"], template.name)
       });
     }
 
-    // 3. ระบบควบคุมการทำงาน
+    // 4. ระบบควบคุมการทำงาน
     let currentMode = "cook"; 
     let currentProvince = localStorage.getItem("user_province") || "ขอนแก่น";
     let currentDistrict = localStorage.getItem("user_district") || "เมืองขอนแก่น";
@@ -395,58 +380,58 @@
 
     const canvas = document.getElementById("wheelCanvas");
     const ctx = canvas.getContext("2d");
-    const wheelColors = ["#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#8B5CF6", "#F97316", "#06B6D4", "#EAB308"];
+    const wheelColors = ["#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#8B5CF6", "#F97316"];
 
-    // ฟังก์ชันวาดวงล้อแบบคมชัดสูง (Retina / High DPI Fix)
+    // ฟังก์ชันปรับความคมชัด HD Canvas
     function setupCanvasDPI() {
       const dpr = window.devicePixelRatio || 2;
-      canvas.width = 310 * dpr;
-      canvas.height = 310 * dpr;
+      canvas.width = 340 * dpr;
+      canvas.height = 340 * dpr;
       ctx.scale(dpr, dpr);
     }
 
+    // วาดวงล้อ: ขยายขนาดใหญ่ขึ้น แสดง 6 ช่องให้อ่านชื่อได้เต็มคำ
     function drawWheel() {
       const numSegments = activeWheelItems.length;
       if (numSegments === 0) return;
       const arcSize = (2 * Math.PI) / numSegments;
-      ctx.clearRect(0, 0, 310, 310);
+      ctx.clearRect(0, 0, 340, 340);
 
       for (let i = 0; i < numSegments; i++) {
         const angle = currentAngle + i * arcSize;
         ctx.beginPath();
         ctx.fillStyle = wheelColors[i % wheelColors.length];
-        ctx.moveTo(155, 155);
-        ctx.arc(155, 155, 150, angle, angle + arcSize);
-        ctx.lineTo(155, 155);
+        ctx.moveTo(170, 170);
+        ctx.arc(170, 170, 165, angle, angle + arcSize);
+        ctx.lineTo(170, 170);
         ctx.fill();
         ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.stroke();
 
-        // ตัวอักษรคมชัด วางกึ่งกลางเสี้ยว ไม่ล้นขอบ
+        // เขียนตัวหนังสือเต็มคำ วางในตำแหน่งที่กว้างที่สุดของเสี้ยว
         ctx.save();
-        ctx.translate(155, 155);
+        ctx.translate(170, 170);
         ctx.rotate(angle + arcSize / 2);
-        ctx.textAlign = "center";
+        ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 13px 'Prompt', sans-serif";
-        ctx.shadowColor = "rgba(0,0,0,0.4)";
-        ctx.shadowBlur = 3;
+        ctx.shadowColor = "rgba(0,0,0,0.5)";
+        ctx.shadowBlur = 4;
         
-        let label = activeWheelItems[i].name;
-        if (label.length > 9) label = label.substring(0, 8) + "..";
-        ctx.fillText(label, 85, 0);
+        // วาดชื่อเมนูเต็มคำ ไม่ตัดทอน
+        ctx.fillText(activeWheelItems[i].name, 150, 0);
         ctx.restore();
       }
 
       // แกนกลางวงล้อ
       ctx.beginPath();
       ctx.fillStyle = "#ffffff";
-      ctx.arc(155, 155, 22, 0, 2 * Math.PI);
+      ctx.arc(170, 170, 24, 0, 2 * Math.PI);
       ctx.fill();
       ctx.fillStyle = "#f59e0b";
-      ctx.arc(155, 155, 13, 0, 2 * Math.PI);
+      ctx.arc(170, 170, 14, 0, 2 * Math.PI);
       ctx.fill();
     }
 
@@ -457,9 +442,10 @@
       refreshWheelDataset();
     };
 
+    // แสดง 6 เมนูต่อการสุ่มหนึ่งรอบ เพื่อให้ช่องกว้าง ตัวหนังสือเต็มคำ
     function refreshWheelDataset() {
       const fullList = (currentMode === "cook") ? cookRecipes100 : dineOutRecipes100;
-      activeWheelItems = [...fullList].sort(() => 0.5 - Math.random()).slice(0, 8);
+      activeWheelItems = [...fullList].sort(() => 0.5 - Math.random()).slice(0, 6);
       drawWheel();
     }
 
@@ -488,7 +474,7 @@
       refreshWheelDataset();
     }
 
-    // 4. จัดการ Dropdown พื้นที่
+    // 5. จัดการ Dropdown พื้นที่
     function initProvinceDropdown() {
       const provSelect = document.getElementById("provinceSelect");
       let html = `<option value="">-- กรุณาเลือกจังหวัด --</option>`;
@@ -551,7 +537,7 @@
       document.getElementById("headerLocation").innerText = locText;
     }
 
-    // 5. ระบบสุ่มหมุนวงล้อ
+    // 6. ระบบหมุนวงล้อสุ่ม
     function spinWheel() {
       if (isSpinning) return;
       isSpinning = true;
@@ -590,7 +576,7 @@
       requestAnimationFrame(animate);
     }
 
-    // 6. แสดงผลผลลัพธ์
+    // 7. แสดงผลผลลัพธ์
     function showResultModal(item) {
       if (currentMode === "cook") {
         document.getElementById("cookName").innerText = item.name;
