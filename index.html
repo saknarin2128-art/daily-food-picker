@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>วันนี้กินอะไรดี? - เมนูด่วน & ร้านใกล้ฉัน</title>
+  <!-- โหลด Tailwind CSS ผ่าน CDN สำหรับตกแต่งหน้าตาแอป -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- นำเข้าฟอนต์ภาษาไทย Prompt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Prompt', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex justify-center p-3 sm:p-6">
+
+  <!-- กล่องควบคุมหลัก จำลองขนาดให้เหมาะกับหน้าจอมือถือ -->
+  <main class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col min-h-[90vh]">
+    
+    <!-- แถบด้านบน (Header) -->
+    <header class="bg-amber-500 text-white p-5 text-center relative shadow-sm">
+      <h1 class="text-2xl font-bold tracking-wide">🍳 วันนี้กินอะไรดี?</h1>
+      <p class="text-xs text-amber-100 mt-1">เมนูประหยัดเวลาสำหรับวัยทำงาน & ร้านเด็ดใกล้ตัว</p>
+    </header>
+
+    <div class="p-5 flex-1 flex flex-col gap-5">
+      
+      <!-- ส่วนระบุตำแหน่ง (Location Context) -->
+      <section class="bg-amber-50 p-4 rounded-2xl border border-amber-200">
+        <label class="block text-xs font-semibold text-amber-800 mb-1">📍 พื้นที่ของคุณ (จังหวัด / อำเภอ):</label>
+        <div class="flex gap-2">
+          <input 
+            type="text" 
+            id="locationInput" 
+            placeholder="เช่น บางละมุง ชลบุรี หรือ พญาไท กทม." 
+            class="flex-1 px-3 py-2 text-sm rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+          >
+          <button 
+            onclick="saveLocation()" 
+            class="bg-amber-600 active:bg-amber-700 text-white text-xs px-3 py-2 rounded-xl font-medium transition"
+          >
+            บันทึก
+          </button>
+        </div>
+      </section>
+
+      <!-- ปุ่มสลับโหมด: ทำเอง หรือ หาของกินข้างนอก -->
+      <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl">
+        <button id="btnTabCook" onclick="switchTab('cook')" class="py-2.5 text-sm font-semibold rounded-xl bg-white shadow-sm text-amber-600 transition">
+          👨‍🍳 ทำอาหารเอง
+        </button>
+        <button id="btnTabEatOut" onclick="switchTab('eatOut')" class="py-2.5 text-sm font-semibold rounded-xl text-slate-500 transition">
+          🛵 ร้านอาหารใกล้ฉัน
+        </button>
+      </div>
+
+      <!-- โหมดที่ 1: ทำอาหารเอง (Cook Mode) -->
+      <section id="cookSection" class="flex flex-col gap-4">
+        <div class="flex justify-between items-center text-xs text-slate-500">
+          <span>เมนูด่วนทำง่าย (ไม่เกิน 15 นาที)</span>
+          <span id="recipeCount" class="font-medium text-amber-600"></span>
+        </div>
+
+        <!-- การ์ดแสดงผลเมนูอาหาร -->
+        <article id="recipeDisplay" class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-center flex flex-col justify-center items-center min-h-[180px]">
+          <span class="text-4xl mb-2">🍽️</span>
+          <h2 class="text-lg font-bold text-slate-800" id="recipeName">กดปุ่มด้านล่างเพื่อสุ่มเมนู</h2>
+          <p class="text-xs text-slate-500 mt-2" id="recipeDetail">ระบบจะคัดเลือกเมนูที่ใช้วัตถุดิบน้อยและปรุงได้ไว</p>
+          <div id="recipeBadges" class="flex gap-2 mt-3 hidden">
+            <span class="bg-emerald-100 text-emerald-700 text-[11px] px-2.5 py-1 rounded-full font-medium" id="recipeTime"></span>
+            <span class="bg-blue-100 text-blue-700 text-[11px] px-2.5 py-1 rounded-full font-medium" id="recipeDifficulty"></span>
+          </div>
+        </article>
+
+        <!-- ปุ่มกดสุ่มเมนู -->
+        <button 
+          onclick="randomRecipe()" 
+          class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white font-bold rounded-2xl shadow-md shadow-amber-200 transition flex items-center justify-center gap-2 text-base"
+        >
+          🎲 สุ่มเมนูทำเองวันนี้
+        </button>
+      </section>
+
+      <!-- โหมดที่ 2: เลือกร้านอาหารใกล้ฉัน (Eat Out Mode) -->
+      <section id="eatOutSection" class="hidden flex flex-col gap-4">
+        <div class="text-xs text-slate-500">
+          ค้นหาร้านอาหารที่มีรีวิวและคะแนนสูงในพื้นที่ของคุณ
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-semibold text-slate-700">หมวดหมู่ที่อยากทาน:</label>
+          <select id="foodCategory" class="px-3 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="ร้านอาหารยอดนิยม">ทุกหมวดหมู่ (ร้านเด็ดทั้งหมด)</option>
+            <option value="อาหารตามสั่ง">อาหารตามสั่ง / จานเดียว</option>
+            <option value="ก๋วยเตี๋ยว">ก๋วยเตี๋ยว / บะหมี่</option>
+            <option value="ส้มตำ ยำ ลาบ">ส้มตำ / อาหารอีสาน</option>
+            <option value="ข้าวแกง อาหารเช้า">ข้าวแกง / ร้านอาหารเช้า</option>
+            <option value="ชาบู ปิ้งย่าง">ชาบู / หมูกระทะ / ปิ้งย่าง</option>
+          </select>
+        </div>
+
+        <!-- ปุ่มค้นหาและเปิด Google Maps ตามเงื่อนไขคะแนนรีวิว -->
+        <button 
+          onclick="searchTopRatedRestaurants()" 
+          class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold rounded-2xl shadow-md shadow-blue-200 transition flex items-center justify-center gap-2 text-base"
+        >
+          🔍 ดูร้านรีวิวสูงสุดใกล้ฉัน
+        </button>
+
+        <p class="text-[11px] text-slate-400 text-center leading-relaxed">
+          * ระบบจะเปิดแผนที่ Google Maps โดยจัดเรียงร้านอาหารตามเรตติ้งรีวิวสูงสุดในอำเภอ/จังหวัดที่คุณกำหนด
+        </p>
+      </section>
+
+    </div>
+
+    <!-- แถบด้านล่าง (Footer) -->
+    <footer class="p-4 text-center border-t border-slate-100 text-[11px] text-slate-400">
+      ผู้ช่วยตัดสินใจมื้ออาหาร • ทำงานได้ทุกวันบนสมาร์ตโฟน
+    </footer>
+  </main>
+
+  <!-- Script ทำงานฝั่ง Logic -->
+  <script>
+    // ฐานข้อมูลเมนูด่วนสำหรับคนทำงาน (ทำเสร็จภายใน 10-15 นาที)
+    const recipes = [
+      { name: "ข้าวไข่ข้นกุ้ง / ปูอัด", time: "10 นาที", diff: "ง่ายมาก", desc: "ไข่ไก่ 2 ฟอง นมสดเล็กน้อย ทอดไฟอ่อนให้เนื้อเยิ้มๆ โปะข้าวสวยร้อนๆ" },
+      { name: "กะเพราหมูสับไข่ดาว", time: "12 นาที", diff: "ง่าย", desc: "ผัดพริกกระเทียมให้หอม ใส่หมูสับ ปรุงรสด้วยซีอิ๊วขาว น้ำมันหอย ตบท้ายด้วยกะเพรา" },
+      { name: "ข้าวผัดไข่ใส่ไส้กรอก", time: "10 นาที", diff: "ง่ายมาก", desc: "ใช้ข้าวเย็นผัด ยีไข่ให้เคลือบเม็ดข้าว ใส่ไส้กรอกหรือแฮม ปรุงรสตามชอบ" },
+      { name: "ต้มจืดเต้าหู้หมูสับสาหร่าย", time: "15 นาที", diff: "ง่าย", desc: "ต้มน้ำซุป ปั้นหมูสับเป็นก้อน ใส่เต้าหู้ไข่และสาหร่าย ซดคล่องคอ ย่อยง่าย" },
+      { name: "ผัดมาม่าทรงเครื่องขี้เมา", time: "12 นาที", diff: "ง่าย", desc: "ลวกเส้นพอสะดุ้ง ผัดกับเนื้อสัตว์และผักที่มีในตู้เย็น เผ็ดร้อนตื่นตัว" },
+      { name: "สุกี้น้ำรวมมิตรอิ่มสบายท้อง", time: "15 นาที", diff: "ง่าย", desc: "ต้มผักกาดขาว วุ้นเส้น อกไก่หรือหมู ราดไข่ไก่ จิ้มน้ำจิ้มสุกี้สำเร็จรูป" },
+      { name: "ข้าวหน้าอกไก่คั่วพริกเกลือ", time: "15 นาที", diff: "ปานกลาง", desc: "หั่นไก่เป็นเต๋า คั่วในกระทะจนสุก ใส่พริกซอย กระเทียม เกลือ คั่วแห้งๆ" }
+    ];
+
+    // โหลดพื้นที่ที่เคยบันทึกไว้ในเบราว์เซอร์
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedLoc = localStorage.getItem("user_food_location");
+      if (savedLoc) {
+        document.getElementById("locationInput").value = savedLoc;
+      }
+      document.getElementById("recipeCount").innerText = `(${recipes.length} เมนูแนะนำ)`;
+    });
+
+    // บันทึกพื้นที่ลงใน LocalStorage
+    function saveLocation() {
+      const loc = document.getElementById("locationInput").value.trim();
+      if (!loc) {
+        alert("กรุณากรอกอำเภอ หรือ จังหวัดก่อนครับ");
+        return;
+      }
+      localStorage.setItem("user_food_location", loc);
+      alert("บันทึกพื้นที่เรียบร้อยแล้ว: " + loc);
+    }
+
+    // ฟังก์ชันสลับแท็บ
+    function switchTab(tab) {
+      const cookSec = document.getElementById("cookSection");
+      const eatSec = document.getElementById("eatOutSection");
+      const btnCook = document.getElementById("btnTabCook");
+      const btnEat = document.getElementById("btnTabEatOut");
+
+      if (tab === 'cook') {
+        cookSec.classList.remove("hidden");
+        eatSec.classList.add("hidden");
+        btnCook.className = "py-2.5 text-sm font-semibold rounded-xl bg-white shadow-sm text-amber-600 transition";
+        btnEat.className = "py-2.5 text-sm font-semibold rounded-xl text-slate-500 transition";
+      } else {
+        cookSec.classList.add("hidden");
+        eatSec.classList.remove("hidden");
+        btnEat.className = "py-2.5 text-sm font-semibold rounded-xl bg-white shadow-sm text-blue-600 transition";
+        btnCook.className = "py-2.5 text-sm font-semibold rounded-xl text-slate-500 transition";
+      }
+    }
+
+    // ฟังก์ชันสุ่มเมนูทำอาหาร
+    function randomRecipe() {
+      const randomIndex = Math.floor(Math.random() * recipes.length);
+      const item = recipes[randomIndex];
+
+      document.getElementById("recipeName").innerText = item.name;
+      document.getElementById("recipeDetail").innerText = item.desc;
+      document.getElementById("recipeTime").innerText = "⏱️ " + item.time;
+      document.getElementById("recipeDifficulty").innerText = "ระดับ: " + item.diff;
+      document.getElementById("recipeBadges").classList.remove("hidden");
+    }
+
+    // ฟังก์ชันสืบค้นร้านอาหารใกล้ฉันและเรียงตามรีวิว
+    function searchTopRatedRestaurants() {
+      const loc = document.getElementById("locationInput").value.trim();
+      const category = document.getElementById("foodCategory").value;
+
+      let searchQuery = "";
+      if (loc) {
+        // ค้นหาโดยระบุหมวดหมู่ + พื้นที่ + เน้นคำว่า เรตติ้งดี รีวิวสูง
+        searchQuery = encodeURIComponent(`${category} ${loc} รีวิวดีที่สุด`);
+      } else {
+        // หากไม่ได้ระบุพื้นที่ ให้ใช้คำว่าใกล้ฉันเพื่อดึง GPS อัตโนมัติจากมือถือ
+        searchQuery = encodeURIComponent(`${category} ใกล้ฉัน เรตติ้งสูงสุด`);
+      }
+
+      // สร้าง URL เปิดไปยัง Google Maps ค้นหาร้านอาหาร
+      const mapsUrl = `https://www.google.com/maps/search/${searchQuery}`;
+      window.open(mapsUrl, "_blank");
+    }
+  </script>
+</body>
+</html>
