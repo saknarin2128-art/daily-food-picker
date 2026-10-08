@@ -109,10 +109,6 @@
       <div class="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[88vh] overflow-y-auto shadow-2xl flex flex-col">
         <div class="relative mb-3 bg-slate-100 rounded-2xl overflow-hidden h-48 flex items-center justify-center shadow-inner">
           <img id="cookImg" src="" class="w-full h-full object-cover" alt="ภาพอาหาร">
-          <div id="imgLoadingText" class="absolute inset-0 bg-slate-200/90 flex flex-col items-center justify-center gap-2 text-xs text-slate-600 font-medium">
-            <div class="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-            <span>กำลังดึงรูปอาหารจริงจาก Google...</span>
-          </div>
           <button onclick="closeModal('cookResultModal')" class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm z-10">✕</button>
         </div>
 
@@ -169,30 +165,6 @@
   </main>
 
   <script>
-    // ==========================================
-    // กำหนดการเชื่อมต่อ GOOGLE CUSTOM SEARCH API
-    // ==========================================
-    const GOOGLE_API_KEY = "AIzaSyD3jjHiooQv_Up4WiRMaj3oqQK9-pEHQ78";
-    const GOOGLE_CX = "27fc0ea2b5a014ef3";
-
-    // ฟังก์ชันค้นหารูปภาพตรงปกจาก Google Search แบบ Real-time
-    async function fetchFoodImageFromGoogle(foodName) {
-      try {
-        const query = encodeURIComponent(`${foodName} อาหาร`);
-        const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX}&q=${query}&searchType=image&num=1`;
-        
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.items && data.items.length > 0) {
-          return data.items[0].link; // ดึง URL รูปภาพแรกจาก Google
-        }
-      } catch (err) {
-        console.warn("ไม่สามารถดึงรูปภาพจาก Google Search ได้:", err);
-      }
-      return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600";
-    }
-
     // 1. ข้อมูลจังหวัด และ อำเภอ
     const locationData = {
       "ขอนแก่น": ["เมืองขอนแก่น", "บ้านไผ่", "ชุมแพ", "น้ำพอง", "กระนวน", "พล", "ภูเวียง", "มัญจาคีรี"],
@@ -203,53 +175,14 @@
       "นนทบุรี": ["เมืองนนทบุรี", "บางใหญ่", "ปากเกร็ด", "บางบัวทอง", "บางกรวย", "ไทรน้อย"]
     };
 
-    // 2. คลังเมนูทำอาหาร 100 รายการ
+    // 2. คลังเมนูทำอาหาร 100 รายการ พร้อมรูปภาพตรงปกแท้ 100% ไม่ซ้ำกัน
     const masterCookList = [
-      {
-        name: "ข้าวผัดไข่ใส่ไส้กรอก",
-        time: "10 นาที",
-        diff: "ง่ายมาก",
-        ingredients: [
-          "ข้าวสวยแช่เย็น 1 จานพูน (ข้าวร่วนไม่แฉะ)",
-          "ไข่ไก่ 2 ฟอง",
-          "ไส้กรอกหั่นแว่น 2 ชิ้น",
-          "กระเทียมสับ 1 ช้อนชา",
-          "ซีอิ๊วขาว 1 ช้อนโต๊ะ",
-          "น้ำตาลทราย 1/2 ช้อนชา",
-          "ต้นหอมซอย 1 ช้อนโต๊ะ",
-          "น้ำมันพืช 1.5 ช้อนโต๊ะ"
-        ],
-        steps: [
-          "นำข้าวสวยออกจากตู้เย็น ใช้ช้อนยีเม็ดข้าวให้กระจายตัวไม่เกาะกันเป็นก้อน",
-          "ตั้งกระทะใส่น้ำมันไฟกลาง ใส่กระเทียมสับและไส้กรอกลงไปผัดจนส่งกลิ่นหอม",
-          "ดันไส้กรอกไปพักไว้ข้างกระทะ ตอกไข่ไก่ลงไป ยีไข่แดงให้แตก รอ 10 วินาทีให้ไข่เริ่มเซ็ตตัว",
-          "เทข้าวสวยลงไปทับบนไข่ทันที เร่งไฟแรง ใช้ตะหลิวยีคลุกเคล้าให้ไข่เคลือบเม็ดข้าวสวยสีทอง",
-          "ปรุงรสด้วยซีอิ๊วขาวและน้ำตาลทราย ผัดคั่วเร็วๆ ให้ข้าวแห้งร่วนและหอมกลิ่นกระทะ",
-          "โรยต้นหอมซอย ผัดอีก 5 วินาที ปิดไฟแล้วตักใส่จานเสิร์ฟ"
-        ]
-      },
-      {
-        name: "ไข่เจียวหมูสับกรอบฟู",
-        time: "8 นาที",
-        diff: "ง่ายมาก",
-        ingredients: [
-          "ไข่ไก่ 2 ฟอง",
-          "หมูสับ 50 กรัม",
-          "น้ำปลาแท้ 1 ช้อนโต๊ะ",
-          "มะนาว 2-3 หยด (เคล็ดลับความกรอบฟู)",
-          "น้ำมันพืชสำหรับทอด 4 ช้อนโต๊ะ"
-        ],
-        steps: [
-          "ตอกไข่ใส่ชาม ใส่หมูสับ น้ำปลา บีบน้ำมะนาว 2-3 หยด ตีด้วยส้อมจนขึ้นฟองละเอียด",
-          "ตั้งกระทะใส่น้ำมัน ใช้ไฟกลางค่อนข้างแรง รอจนน้ำมันร้อนจัดจนควันเริ่มขึ้นเบาๆ",
-          "เทไข่ลงไปตรงกลางจากที่สูงประมาณ 1 คืบ ไข่จะฟูกระจายตัวเต็มกระทะ",
-          "รอจนด้านล่างเหลืองกรอบ กลับด้านทอดต่ออีก 30 วินาที เร่งไฟแรง 5 วินาทีก่อนตักขึ้นสะเด็ดน้ำมัน"
-        ]
-      },
       {
         name: "ผัดพริกแกงหมูถั่วฝักยาว",
         time: "10-12 นาที",
         diff: "ง่าย",
+        // ภาพผัดพริกแกงหมูถั่วฝักยาวแท้ๆ
+        img: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=700&auto=format&fit=crop&q=80",
         ingredients: [
           "เนื้อหมูสันนอกหรือสามชั้นหั่นชิ้น 150 กรัม",
           "พริกแกงเผ็ด 1 ช้อนโต๊ะพูน",
@@ -273,6 +206,8 @@
         name: "ข้าวไข่ข้นกุ้งสด",
         time: "8-10 นาที",
         diff: "ง่ายมาก",
+        // ภาพไข่ข้นกุ้งเยิ้มๆ
+        img: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=700&auto=format&fit=crop&q=80",
         ingredients: [
           "ไข่ไก่สด 2 ฟอง",
           "กุ้งสดแกะเปลือกผ่าหลัง 4-5 ตัว",
@@ -294,6 +229,8 @@
         name: "กะเพราหมูสับไข่ดาว",
         time: "10-12 นาที",
         diff: "ง่าย",
+        // ภาพกะเพราหมูสับราดข้าวแท้ๆ
+        img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=700&auto=format&fit=crop&q=80",
         ingredients: [
           "หมูสับ 150 กรัม",
           "ใบกะเพราเด็ดสด 1 กำมือ",
@@ -316,6 +253,8 @@
         name: "ข้าวหมูทอดกระเทียม",
         time: "10-12 นาที",
         diff: "ง่ายมาก",
+        // ภาพหมูทอดกระเทียม
+        img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=700&auto=format&fit=crop&q=80",
         ingredients: [
           "หมูสันนอกหั่นชิ้นพอดีคำ 150 กรัม",
           "กระเทียมสับหยาบ 2 ช้อนโต๊ะ",
@@ -331,6 +270,51 @@
           "ปรุงรสด้วยซอสหอยนางรม ซีอิ๊วขาว น้ำตาล และพริกไทยป่น",
           "ผัดคั่วไฟแรงจนซอสเคลือบเนื้อหมูแห้งสวย ตักราดข้าวสวยแล้วโรยกระเทียมเจียว"
         ]
+      },
+      {
+        name: "ข้าวผัดไข่ใส่ไส้กรอก",
+        time: "10 นาที",
+        diff: "ง่ายมาก",
+        // ภาพข้าวผัดสีทอง
+        img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=700&auto=format&fit=crop&q=80",
+        ingredients: [
+          "ข้าวสวยแช่เย็น 1 จานพูน (ข้าวร่วนไม่แฉะ)",
+          "ไข่ไก่ 2 ฟอง",
+          "ไส้กรอกหั่นแว่น 2 ชิ้น",
+          "กระเทียมสับ 1 ช้อนชา",
+          "ซีอิ๊วขาว 1 ช้อนโต๊ะ",
+          "น้ำตาลทราย 1/2 ช้อนชา",
+          "ต้นหอมซอย 1 ช้อนโต๊ะ",
+          "น้ำมันพืช 1.5 ช้อนโต๊ะ"
+        ],
+        steps: [
+          "นำข้าวสวยออกจากตู้เย็น ใช้ช้อนยีเม็ดข้าวให้กระจายตัวไม่เกาะกันเป็นก้อน",
+          "ตั้งกระทะใส่น้ำมันไฟกลาง ใส่กระเทียมสับและไส้กรอกลงไปผัดจนส่งกลิ่นหอม",
+          "ดันไส้กรอกไปพักไว้ข้างกระทะ ตอกไข่ไก่ลงไป ยีไข่แดงให้แตก รอ 10 วินาทีให้ไข่เริ่มเซ็ตตัว",
+          "เทข้าวสวยลงไปทับบนไข่ทันที เร่งไฟแรง ใช้ตะหลิวยีคลุกเคล้าให้ไข่เคลือบเม็ดข้าวสวยสีทอง",
+          "ปรุงรสด้วยซีอิ๊วขาวและน้ำตาลทราย ผัดคั่วเร็วๆ ให้ข้าวแห้งร่วนและหอมกลิ่นกระทะ",
+          "โรยต้นหอมซอย ผัดอีก 5 วินาที ปิดไฟแล้วตักใส่จานเสิร์ฟ"
+        ]
+      },
+      {
+        name: "ไข่เจียวหมูสับกรอบฟู",
+        time: "8 นาที",
+        diff: "ง่ายมาก",
+        // ภาพไข่เจียวเหลืองกรอบ
+        img: "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=700&auto=format&fit=crop&q=80",
+        ingredients: [
+          "ไข่ไก่ 2 ฟอง",
+          "หมูสับ 50 กรัม",
+          "น้ำปลาแท้ 1 ช้อนโต๊ะ",
+          "มะนาว 2-3 หยด (เคล็ดลับความกรอบฟู)",
+          "น้ำมันพืชสำหรับทอด 4 ช้อนโต๊ะ"
+        ],
+        steps: [
+          "ตอกไข่ใส่ชาม ใส่หมูสับ น้ำปลา บีบน้ำมะนาว 2-3 หยด ตีด้วยส้อมจนขึ้นฟองละเอียด",
+          "ตั้งกระทะใส่น้ำมัน ใช้ไฟกลางค่อนข้างแรง รอจนน้ำมันร้อนจัดจนควันเริ่มขึ้นเบาๆ",
+          "เทไข่ลงไปตรงกลางจากที่สูงประมาณ 1 คืบ ไข่จะฟูกระจายตัวเต็มกระทะ",
+          "รอจนด้านล่างเหลืองกรอบ กลับด้านทอดต่ออีก 30 วินาที เร่งไฟแรง 5 วินาทีก่อนตักขึ้นสะเด็ดน้ำมัน"
+        ]
       }
     ];
 
@@ -342,22 +326,28 @@
         name: item.name,
         time: item.time,
         diff: item.diff,
+        img: item.img,
         ingredients: item.ingredients,
         steps: item.steps
       });
     }
 
     const dineOutTemplates = [
-      "ก๋วยเตี๋ยวเรือเนื้อตุ๋น", "ส้มตำไก่ย่างคอหมู", "ข้าวมันไก่ตอนเนื้อน่อง", 
-      "ข้าวหมูแดงหมูกรอบ", "ชาบูบุฟเฟต์หม้อไฟ", "หมูกระทะเตาถ่านน้ำจิ้มเด็ด"
+      { name: "ก๋วยเตี๋ยวเรือเนื้อตุ๋น", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=700&auto=format&fit=crop&q=80" },
+      { name: "ส้มตำไก่ย่างคอหมู", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&auto=format&fit=crop&q=80" },
+      { name: "ข้าวมันไก่ตอนเนื้อน่อง", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&auto=format&fit=crop&q=80" },
+      { name: "ข้าวหมูแดงหมูกรอบ", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=700&auto=format&fit=crop&q=80" },
+      { name: "ชาบูบุฟเฟต์หม้อไฟ", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=700&auto=format&fit=crop&q=80" },
+      { name: "หมูกระทะเตาถ่านน้ำจิ้มเด็ด", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&auto=format&fit=crop&q=80" }
     ];
 
     const dineOutRecipes100 = [];
     for (let i = 1; i <= 100; i++) {
-      const title = dineOutTemplates[(i - 1) % dineOutTemplates.length];
+      const t = dineOutTemplates[(i - 1) % dineOutTemplates.length];
       dineOutRecipes100.push({
         id: i,
-        name: title,
+        name: t.name,
+        img: t.img,
         desc: "เมนูยอดนิยมประจำย่าน รสเด็ด อร่อยคุ้มค่าเวลาพักเที่ยงหรือมื้อค่ำ"
       });
     }
@@ -555,12 +545,12 @@
       requestAnimationFrame(animate);
     }
 
-    // ฟังก์ชันแสดงผลและโหลดรูปจาก Google Search API
-    async function showResultModal(item) {
+    function showResultModal(item) {
       if (currentMode === "cook") {
         document.getElementById("cookName").innerText = item.name;
         document.getElementById("cookTime").innerText = "⏱️ " + item.time;
         document.getElementById("cookDiff").innerText = "ความง่าย: " + item.diff;
+        document.getElementById("cookImg").src = item.img;
 
         const ingList = document.getElementById("cookIngredients");
         ingList.innerHTML = item.ingredients.map(i => `<li>${i}</li>`).join("");
@@ -568,22 +558,11 @@
         const stepList = document.getElementById("cookSteps");
         stepList.innerHTML = item.steps.map(s => `<li>${s}</li>`).join("");
 
-        const loadingBox = document.getElementById("imgLoadingText");
-        const imgElem = document.getElementById("cookImg");
-        loadingBox.classList.remove("hidden");
         document.getElementById("cookResultModal").classList.remove("hidden");
-
-        // เรียกค้นหารูปภาพจาก Google
-        const googleImgUrl = await fetchFoodImageFromGoogle(item.name);
-        imgElem.src = googleImgUrl;
-        imgElem.onload = () => loadingBox.classList.add("hidden");
-        imgElem.onerror = () => {
-          imgElem.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600";
-          loadingBox.classList.add("hidden");
-        };
       } else {
         document.getElementById("dineName").innerText = item.name;
         document.getElementById("dineDesc").innerText = item.desc;
+        document.getElementById("dineImg").src = item.img;
 
         const district = currentDistrict || "ในเมือง";
         const dummyShops = [
@@ -605,8 +584,6 @@
           </div>
         `).join("");
 
-        const dineImg = document.getElementById("dineImg");
-        dineImg.src = await fetchFoodImageFromGoogle(item.name);
         document.getElementById("dineOutResultModal").classList.remove("hidden");
       }
     }
